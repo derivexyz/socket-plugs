@@ -46,6 +46,7 @@ import {
 import path from "path";
 import { ProjectTypeMap } from "../../src/enums/projectType";
 import { chainIdReverseMap } from "../setup/enumMaps";
+import { exec } from "node:child_process";
 
 export const getOrDeploy = async (
   contractName: string,
@@ -190,6 +191,9 @@ export const verify = async (
     const chainSlug = await getChainSlug();
     if (chainSlug === 31337) return;
 
+    exec(
+      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier sourcify --verifier-url https://sourcify.parsec.finance/verify`
+    );
     console.log(
       `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier sourcify --verifier-url https://sourcify.parsec.finance/verify`
     );

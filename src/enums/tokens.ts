@@ -47,4 +47,5 @@ export enum Tokens {
   HYPE = "HYPE",
   PUFETH = "PUFETH",
   KHYPE = "KHYPE",
+  USDH = "USDH",
 }

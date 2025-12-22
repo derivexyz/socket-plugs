@@ -775,5 +775,29 @@ export const pc: ProjectConstants = {
         },
       },
     },
+    [Tokens.USDH]: {
+      controllerChains: [ChainSlug.LYRA],
+      vaultChains: [ChainSlug.HYPEREVM],
+      hook: {
+        hookType: Hooks.LYRA_TSA_SHAREHANDLER_DEPOSIT_HOOK,
+        limitsAndPoolId: {
+          [ChainSlug.LYRA]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100000000",
+              receivingLimit: "100000000",
+              poolCount: 0,
+            },
+          },
+
+          [ChainSlug.HYPEREVM]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100000000",
+              receivingLimit: "100000000",
+              poolCount: 0,
+            },
+          },
+        },
+      },
+    },
   },
 };
