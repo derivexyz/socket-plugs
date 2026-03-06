@@ -48,4 +48,6 @@ export enum Tokens {
   PUFETH = "PUFETH",
   KHYPE = "KHYPE",
   USDH = "USDH",
+  jitoSOL = "jitoSOL",
+  cbADA = "cbADA",
 }

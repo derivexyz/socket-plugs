@@ -268,6 +268,17 @@
           "FAST": "0x300E89939190A352160501aa5C362C5BF9698BE2"
         }
       }
+    },
+    "cbADA": {
+      "isAppChain": true,
+      "MintableToken": "0x378Fe6E5F914899387F0Ce88B0676dB2F47ea3F4",
+      "Controller": "0x3D54EC8aFEfD4AE3b0B3d0130a7f31226f005430",
+      "LyraTSAShareHandlerDepositHook": "0x4B71a00deede60b52b28e0971D0453010Fae5628",
+      "connectors": {
+        "11155420": {
+          "FAST": "0xb77823a4a60cbf3d96ea3F080Fe81CdcaB4a243D"
+        }
+      }
     }
   },
   "421614": {
@@ -598,6 +609,17 @@
       "connectors": {
         "901": {
           "FAST": "0x1d1BbBC3847b48352A0D3F92F69e66F1E459e0D0"
+        }
+      }
+    },
+    "cbADA": {
+      "isAppChain": false,
+      "NonMintableToken": "0xE493aba1e0E012a4c8311dD92AA1C2b68b2883B6",
+      "Vault": "0xCBC52a7f34CFb1105cE622Dbe92F51Caa6Cf7539",
+      "LyraTSAShareHandlerDepositHook": "0x0760d520DE308538A3e475623Aaa4CDCEad08A45",
+      "connectors": {
+        "901": {
+          "FAST": "0x977c94D9C50A1fF832d462Ef7bB986Ce0b6DB39A"
         }
       }
     }

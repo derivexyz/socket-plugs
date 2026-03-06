@@ -7,16 +7,17 @@ import { ChainSlug } from "@socket.tech/dl-core";
 import { HookContracts, SBAddresses, STAddresses } from "../../src";
 
 const chainToExpectedOwner = {
-  [ChainSlug.MAINNET]: "0x246d38588b16Dd877c558b245e6D5a711C649fCF",
-  [ChainSlug.ARBITRUM]: "0x2CcF21e5912e9ecCcB0ecdEe9744E5c507cf88AE",
-  [ChainSlug.LYRA]: "0xB176A44D819372A38cee878fB0603AEd4d26C5a5",
-  [ChainSlug.BASE]: "0xbfA8B86391c5eCAd0eBe2B158D9Cd9866DDBAaDa",
+  [ChainSlug.MAINNET]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.ARBITRUM]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.LYRA]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.BASE]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
   [ChainSlug.BLAST]: "0x14232db3852eA44A1be8DB35e82D56191f534D95",
   [ChainSlug.MODE]: "0x14232db3852eA44A1be8DB35e82D56191f534D95",
-  [ChainSlug.OPTIMISM]: "0xD4C00FE7657791C2A43025dE483F05E49A5f76A6",
-  [ChainSlug.HYPEREVM]: "0x86286bF62183d3aF4F77Be56974d3Fb81508F0Cb",
+  [ChainSlug.OPTIMISM]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.HYPEREVM]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
 };
 
+let nominateTxs = {};
 let msTxs = {};
 
 async function getOwnerAndNominee(contract: ethers.Contract) {
@@ -108,6 +109,15 @@ async function handleOwnershipChangeover(
       console.log("Nominating, tx hash: ", tx.hash);
       await tx.wait();
     }
+  } else {
+    console.warn(
+      "Unexpected owner/nominee state for contract",
+      contract.address,
+      "owner:",
+      owner,
+      "nominee:",
+      nominee
+    );
   }
 }
 
@@ -207,12 +217,12 @@ async function checkAndTransferOwnership(addresses: SBAddresses | STAddresses) {
 
 export const main = async () => {
   try {
-    const { tokens } = getConfigs();
+    // const { tokens } = getConfigs();
     printConfigs();
     const addresses = getProjectAddresses();
     const addressesToCheck = {};
     for (const chain of Object.keys(addresses)) {
-      for (const token of tokens) {
+      for (const token of Object.keys(addresses[chain])) {
         if (addresses[chain][token]) {
           if (!addressesToCheck[chain]) {
             addressesToCheck[chain] = {};

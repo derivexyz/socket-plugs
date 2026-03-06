@@ -7806,203 +7806,6 @@
     "inputs": []
   },
   {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "_subAccounts",
-        "type": "address",
-        "internalType": "contract ISubAccounts"
-      },
-      {
-        "name": "_cash",
-        "type": "address",
-        "internalType": "contract ICashAsset"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "OIFeeRateBPS",
-    "inputs": [
-      {
-        "name": "asset",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "checkAllAssetCaps",
-    "inputs": [
-      {
-        "name": "manager",
-        "type": "address",
-        "internalType": "contract IManager"
-      },
-      {
-        "name": "accountId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "tradeId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getAssetOIFee",
-    "inputs": [
-      {
-        "name": "asset",
-        "type": "address",
-        "internalType": "contract IGlobalSubIdOITracking"
-      },
-      {
-        "name": "subId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "delta",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "tradeId",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "price",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "fee",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getPreviousAssetsLength",
-    "inputs": [
-      {
-        "name": "assetBalances",
-        "type": "tuple[]",
-        "internalType": "struct ISubAccounts.AssetBalance[]",
-        "components": [
-          {
-            "name": "asset",
-            "type": "address",
-            "internalType": "contract IAsset"
-          },
-          {
-            "name": "subId",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "balance",
-            "type": "int256",
-            "internalType": "int256"
-          }
-        ]
-      },
-      {
-        "name": "assetDeltas",
-        "type": "tuple[]",
-        "internalType": "struct ISubAccounts.AssetDelta[]",
-        "components": [
-          {
-            "name": "asset",
-            "type": "address",
-            "internalType": "contract IAsset"
-          },
-          {
-            "name": "subId",
-            "type": "uint96",
-            "internalType": "uint96"
-          },
-          {
-            "name": "delta",
-            "type": "int256",
-            "internalType": "int256"
-          }
-        ]
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "setOIFeeRateBPS",
-    "inputs": [
-      {
-        "name": "asset",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "newFeeRate",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "OIFeeRateSet",
-    "inputs": [
-      {
-        "name": "asset",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      },
-      {
-        "name": "oiFeeRate",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "BM_OIFeeRateTooHigh",
-    "inputs": []
-  },
-  {
     "type": "function",
     "name": "annualise",
     "inputs": [
@@ -9836,6 +9639,601 @@
     "inputs": []
   },
   {
+    "type": "function",
+    "name": "IS_SCRIPT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "IS_TEST",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "excludeArtifacts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "excludedArtifacts_",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "excludeContracts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "excludedContracts_",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "excludeSelectors",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "excludedSelectors_",
+        "type": "tuple[]",
+        "internalType": "struct StdInvariant.FuzzSelector[]",
+        "components": [
+          {
+            "name": "addr",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "selectors",
+            "type": "bytes4[]",
+            "internalType": "bytes4[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "excludeSenders",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "excludedSenders_",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "failed",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setUp",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "targetArtifactSelectors",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedArtifactSelectors_",
+        "type": "tuple[]",
+        "internalType": "struct StdInvariant.FuzzArtifactSelector[]",
+        "components": [
+          {
+            "name": "artifact",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "selectors",
+            "type": "bytes4[]",
+            "internalType": "bytes4[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "targetArtifacts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedArtifacts_",
+        "type": "string[]",
+        "internalType": "string[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "targetContracts",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedContracts_",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "targetInterfaces",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedInterfaces_",
+        "type": "tuple[]",
+        "internalType": "struct StdInvariant.FuzzInterface[]",
+        "components": [
+          {
+            "name": "addr",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "artifacts",
+            "type": "string[]",
+            "internalType": "string[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "targetSelectors",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedSelectors_",
+        "type": "tuple[]",
+        "internalType": "struct StdInvariant.FuzzSelector[]",
+        "components": [
+          {
+            "name": "addr",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "selectors",
+            "type": "bytes4[]",
+            "internalType": "bytes4[]"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "targetSenders",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "targetedSenders_",
+        "type": "address[]",
+        "internalType": "address[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "testForkUpgradeMultipleManagers",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "log",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_address",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_array",
+    "inputs": [
+      {
+        "name": "val",
+        "type": "uint256[]",
+        "indexed": false,
+        "internalType": "uint256[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_array",
+    "inputs": [
+      {
+        "name": "val",
+        "type": "int256[]",
+        "indexed": false,
+        "internalType": "int256[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_array",
+    "inputs": [
+      {
+        "name": "val",
+        "type": "address[]",
+        "indexed": false,
+        "internalType": "address[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_bytes",
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_bytes32",
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_int",
+    "inputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "indexed": false,
+        "internalType": "int256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_address",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_array",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "uint256[]",
+        "indexed": false,
+        "internalType": "uint256[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_array",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "int256[]",
+        "indexed": false,
+        "internalType": "int256[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_array",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "address[]",
+        "indexed": false,
+        "internalType": "address[]"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_bytes",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_bytes32",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "bytes32",
+        "indexed": false,
+        "internalType": "bytes32"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_decimal_int",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "int256",
+        "indexed": false,
+        "internalType": "int256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_decimal_uint",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      },
+      {
+        "name": "decimals",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_int",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "int256",
+        "indexed": false,
+        "internalType": "int256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_string",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_named_uint",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      },
+      {
+        "name": "val",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_string",
+    "inputs": [
+      {
+        "name": "",
+        "type": "string",
+        "indexed": false,
+        "internalType": "string"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "log_uint",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "logs",
+    "inputs": [
+      {
+        "name": "",
+        "type": "bytes",
+        "indexed": false,
+        "internalType": "bytes"
+      }
+    ],
+    "anonymous": false
+  },
+  {
     "type": "constructor",
     "inputs": [
       {
@@ -11571,616 +11969,6 @@
   },
   {
     "type": "function",
-    "name": "IS_TEST",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "excludeArtifacts",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "excludedArtifacts_",
-        "type": "string[]",
-        "internalType": "string[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "excludeContracts",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "excludedContracts_",
-        "type": "address[]",
-        "internalType": "address[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "excludeSelectors",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "excludedSelectors_",
-        "type": "tuple[]",
-        "internalType": "struct StdInvariant.FuzzSelector[]",
-        "components": [
-          {
-            "name": "addr",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "selectors",
-            "type": "bytes4[]",
-            "internalType": "bytes4[]"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "excludeSenders",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "excludedSenders_",
-        "type": "address[]",
-        "internalType": "address[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "failed",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "setUp",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "targetArtifactSelectors",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedArtifactSelectors_",
-        "type": "tuple[]",
-        "internalType": "struct StdInvariant.FuzzArtifactSelector[]",
-        "components": [
-          {
-            "name": "artifact",
-            "type": "string",
-            "internalType": "string"
-          },
-          {
-            "name": "selectors",
-            "type": "bytes4[]",
-            "internalType": "bytes4[]"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "targetArtifacts",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedArtifacts_",
-        "type": "string[]",
-        "internalType": "string[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "targetContracts",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedContracts_",
-        "type": "address[]",
-        "internalType": "address[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "targetInterfaces",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedInterfaces_",
-        "type": "tuple[]",
-        "internalType": "struct StdInvariant.FuzzInterface[]",
-        "components": [
-          {
-            "name": "addr",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "artifacts",
-            "type": "string[]",
-            "internalType": "string[]"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "targetSelectors",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedSelectors_",
-        "type": "tuple[]",
-        "internalType": "struct StdInvariant.FuzzSelector[]",
-        "components": [
-          {
-            "name": "addr",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "selectors",
-            "type": "bytes4[]",
-            "internalType": "bytes4[]"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "targetSenders",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "targetedSenders_",
-        "type": "address[]",
-        "internalType": "address[]"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "testBlockUser",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "testBurn",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "testCannotBlockZeroAddress",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "testInitialSetup",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "testMint",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "log",
-    "inputs": [
-      {
-        "name": "",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_address",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_array",
-    "inputs": [
-      {
-        "name": "val",
-        "type": "uint256[]",
-        "indexed": false,
-        "internalType": "uint256[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_array",
-    "inputs": [
-      {
-        "name": "val",
-        "type": "int256[]",
-        "indexed": false,
-        "internalType": "int256[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_array",
-    "inputs": [
-      {
-        "name": "val",
-        "type": "address[]",
-        "indexed": false,
-        "internalType": "address[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_bytes",
-    "inputs": [
-      {
-        "name": "",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_bytes32",
-    "inputs": [
-      {
-        "name": "",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_int",
-    "inputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "indexed": false,
-        "internalType": "int256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_address",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "address",
-        "indexed": false,
-        "internalType": "address"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_array",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "uint256[]",
-        "indexed": false,
-        "internalType": "uint256[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_array",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "int256[]",
-        "indexed": false,
-        "internalType": "int256[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_array",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "address[]",
-        "indexed": false,
-        "internalType": "address[]"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_bytes",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_bytes32",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_decimal_int",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "int256",
-        "indexed": false,
-        "internalType": "int256"
-      },
-      {
-        "name": "decimals",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_decimal_uint",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      },
-      {
-        "name": "decimals",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_int",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "int256",
-        "indexed": false,
-        "internalType": "int256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_string",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_named_uint",
-    "inputs": [
-      {
-        "name": "key",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      },
-      {
-        "name": "val",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_string",
-    "inputs": [
-      {
-        "name": "",
-        "type": "string",
-        "indexed": false,
-        "internalType": "string"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "log_uint",
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "logs",
-    "inputs": [
-      {
-        "name": "",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "function",
     "name": "BLOCK_MANAGER_ROLE",
     "inputs": [],
     "outputs": [
@@ -12319,19 +12107,6 @@
       }
     ],
     "anonymous": false
-  },
-  {
-    "type": "function",
-    "name": "IS_SCRIPT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -12700,6 +12475,150 @@
   },
   {
     "type": "function",
+    "name": "checkAllAssetCaps",
+    "inputs": [
+      {
+        "name": "manager",
+        "type": "address",
+        "internalType": "contract IManager"
+      },
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "tradeId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getAssetOIFee",
+    "inputs": [
+      {
+        "name": "asset",
+        "type": "address",
+        "internalType": "contract IGlobalSubIdOITracking"
+      },
+      {
+        "name": "subId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "delta",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "tradeId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "price",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "fee",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getPreviousAssetsLength",
+    "inputs": [
+      {
+        "name": "assetBalances",
+        "type": "tuple[]",
+        "internalType": "struct ISubAccounts.AssetBalance[]",
+        "components": [
+          {
+            "name": "asset",
+            "type": "address",
+            "internalType": "contract IAsset"
+          },
+          {
+            "name": "subId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "balance",
+            "type": "int256",
+            "internalType": "int256"
+          }
+        ]
+      },
+      {
+        "name": "assetDeltas",
+        "type": "tuple[]",
+        "internalType": "struct ISubAccounts.AssetDelta[]",
+        "components": [
+          {
+            "name": "asset",
+            "type": "address",
+            "internalType": "contract IAsset"
+          },
+          {
+            "name": "subId",
+            "type": "uint96",
+            "internalType": "uint96"
+          },
+          {
+            "name": "delta",
+            "type": "int256",
+            "internalType": "int256"
+          }
+        ]
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "event",
+    "name": "OIFeeRateSet",
+    "inputs": [
+      {
+        "name": "asset",
+        "type": "address",
+        "indexed": false,
+        "internalType": "address"
+      },
+      {
+        "name": "oiFeeRate",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "BM_OIFeeRateTooHigh",
+    "inputs": []
+  },
+  {
+    "type": "function",
     "name": "implementation",
     "inputs": [],
     "outputs": [
@@ -12995,83 +12914,6 @@
       }
     ],
     "anonymous": false
-  },
-  {
-    "type": "function",
-    "name": "approve",
-    "inputs": [
-      {
-        "name": "spender",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transfer",
-    "inputs": [
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "transferFrom",
-    "inputs": [
-      {
-        "name": "from",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "to",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "amount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -13468,6 +13310,35 @@
       }
     ],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "verify",
+    "inputs": [
+      {
+        "name": "key",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "hash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "signature",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes4",
+        "internalType": "bytes4"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -13915,165 +13786,6 @@
   {
     "type": "error",
     "name": "LFF_SettlementDataTooOld",
-    "inputs": []
-  },
-  {
-    "type": "event",
-    "name": "SpotDiffCapUpdated",
-    "inputs": [
-      {
-        "name": "spotDiffCap",
-        "type": "uint256",
-        "indexed": false,
-        "internalType": "uint256"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "SpotDiffUpdated",
-    "inputs": [
-      {
-        "name": "spotDiff",
-        "type": "int96",
-        "indexed": false,
-        "internalType": "int96"
-      },
-      {
-        "name": "confidence",
-        "type": "uint96",
-        "indexed": false,
-        "internalType": "uint96"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint64",
-        "indexed": false,
-        "internalType": "uint64"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "LSDF_InvalidConfidence",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "LSDF_InvalidSpotDiffCap",
-    "inputs": []
-  },
-  {
-    "type": "event",
-    "name": "SpotPriceUpdated",
-    "inputs": [
-      {
-        "name": "spot",
-        "type": "uint96",
-        "indexed": false,
-        "internalType": "uint96"
-      },
-      {
-        "name": "confidence",
-        "type": "uint96",
-        "indexed": false,
-        "internalType": "uint96"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint64",
-        "indexed": false,
-        "internalType": "uint64"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "LSF_InvalidConfidence",
-    "inputs": []
-  },
-  {
-    "type": "event",
-    "name": "VolDataUpdated",
-    "inputs": [
-      {
-        "name": "expiry",
-        "type": "uint64",
-        "indexed": true,
-        "internalType": "uint64"
-      },
-      {
-        "name": "volDetails",
-        "type": "tuple",
-        "indexed": false,
-        "internalType": "struct ILyraVolFeed.VolDetails",
-        "components": [
-          {
-            "name": "SVI_a",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "SVI_b",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "SVI_rho",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "SVI_m",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "SVI_sigma",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "SVI_fwd",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "SVI_refTau",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
-          {
-            "name": "confidence",
-            "type": "uint64",
-            "internalType": "uint64"
-          },
-          {
-            "name": "timestamp",
-            "type": "uint64",
-            "internalType": "uint64"
-          }
-        ]
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "LVF_InvalidConfidence",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "LVF_InvalidVolDataTimestamp",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "LVF_MissingExpiryData",
     "inputs": []
   },
   {
@@ -17973,37 +17685,6 @@
   },
   {
     "type": "function",
-    "name": "getResult",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "result",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "confidence",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "spotFeed",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract ISpotFeed"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "getSpot",
     "inputs": [],
     "outputs": [
@@ -19529,84 +19210,6 @@
     "inputs": []
   },
   {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "_minRate",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "_rateMultiplier",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "_highRateMultiplier",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "_optimalUtil",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "highRateMultiplier",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "minRate",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "optimalUtil",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "rateMultiplier",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
     "type": "function",
     "name": "getLBTSAAddresses",
     "inputs": [],
@@ -20397,157 +20000,6 @@
     "inputs": []
   },
   {
-    "type": "function",
-    "name": "testFork",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "execute",
-    "inputs": [
-      {
-        "name": "target",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "value",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "data",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "_proposer",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "_executor",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "_token",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "batches",
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "total",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "executed",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "execute",
-    "inputs": [
-      {
-        "name": "batchId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "executor",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "nextBatchId",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "propose",
-    "inputs": [
-      {
-        "name": "targets",
-        "type": "address[]",
-        "internalType": "address[]"
-      },
-      {
-        "name": "amounts",
-        "type": "uint256[]",
-        "internalType": "uint256[]"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "proposer",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
     "type": "constructor",
     "inputs": [
       {
@@ -20638,141 +20090,13 @@
   },
   {
     "type": "function",
-    "name": "confidence",
+    "name": "spotFeed",
     "inputs": [],
     "outputs": [
       {
         "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getInterestRate",
-    "inputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "rate",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int64",
-        "internalType": "int64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "setRate",
-    "inputs": [
-      {
-        "name": "_rate",
-        "type": "int64",
-        "internalType": "int64"
-      },
-      {
-        "name": "_confidence",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "event",
-    "name": "RateUpdated",
-    "inputs": [
-      {
-        "name": "rate",
-        "type": "int64",
-        "indexed": false,
-        "internalType": "int64"
-      },
-      {
-        "name": "confidence",
-        "type": "uint64",
-        "indexed": false,
-        "internalType": "uint64"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "error",
-    "name": "LRFS_StaticRateOutOfRange",
-    "inputs": []
-  },
-  {
-    "type": "function",
-    "name": "setSpotDiffCap",
-    "inputs": [
-      {
-        "name": "_spotDiffCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "spotDiffCap",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "spotDiffDetails",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "spotDiff",
-        "type": "int96",
-        "internalType": "int96"
-      },
-      {
-        "name": "confidence",
-        "type": "uint64",
-        "internalType": "uint64"
-      },
-      {
-        "name": "timestamp",
-        "type": "uint64",
-        "internalType": "uint64"
+        "type": "address",
+        "internalType": "contract ISpotFeed"
       }
     ],
     "stateMutability": "view"
@@ -20929,16 +20253,6 @@
     "anonymous": false
   },
   {
-    "type": "error",
-    "name": "SVI_InvalidParameters",
-    "inputs": []
-  },
-  {
-    "type": "error",
-    "name": "SVI_NoForwardPrice",
-    "inputs": []
-  },
-  {
     "type": "function",
     "name": "allowedModules",
     "inputs": [
@@ -21055,6 +20369,30 @@
   },
   {
     "type": "function",
+    "name": "approve",
+    "inputs": [
+      {
+        "name": "spender",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "initialize",
     "inputs": [
       {
@@ -21136,6 +20474,59 @@
       }
     ],
     "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "transfer",
+    "inputs": [
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "transferFrom",
+    "inputs": [
+      {
+        "name": "from",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "to",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "amount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
     "stateMutability": "nonpayable"
   },
   {
@@ -21304,37 +20695,6 @@
     ],
     "outputs": [],
     "stateMutability": "payable"
-  },
-  {
-    "type": "function",
-    "name": "setSpotDiff",
-    "inputs": [
-      {
-        "name": "_spotDiff",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "_confidence",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "spotDiff",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
   },
   {
     "type": "constructor",
@@ -21600,19 +20960,6 @@
     "type": "error",
     "name": "OE_ZeroExpiry",
     "inputs": []
-  },
-  {
-    "type": "function",
-    "name": "submitData",
-    "inputs": [
-      {
-        "name": "managerData",
-        "type": "bytes",
-        "internalType": "bytes"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
   },
   {
     "type": "constructor",
@@ -22166,326 +21513,6 @@
   },
   {
     "type": "function",
-    "name": "getBasisContingencyParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.BasisContingencyParameters",
-        "components": [
-          {
-            "name": "scenarioSpotUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "scenarioSpotDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContAddFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContMultFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getOtherContingencyParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.OtherContingencyParameters",
-        "components": [
-          {
-            "name": "pegLossThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "pegLossFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confMargin",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basePercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "perpPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "optionPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getStaticDiscountParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.MarginParameters",
-        "components": [
-          {
-            "name": "imFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateMultScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateAddScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "baseStaticDiscount",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getVolShockParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.VolShockParameters",
-        "components": [
-          {
-            "name": "volRangeUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "volRangeDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "shortTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "longTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "dteFloor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "setBasisContingencyParams",
-    "inputs": [
-      {
-        "name": "_basisContParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.BasisContingencyParameters",
-        "components": [
-          {
-            "name": "scenarioSpotUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "scenarioSpotDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContAddFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContMultFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setMarginParams",
-    "inputs": [
-      {
-        "name": "_marginParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.MarginParameters",
-        "components": [
-          {
-            "name": "imFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateMultScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateAddScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "baseStaticDiscount",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setOtherContingencyParams",
-    "inputs": [
-      {
-        "name": "_otherContParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.OtherContingencyParameters",
-        "components": [
-          {
-            "name": "pegLossThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "pegLossFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confMargin",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basePercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "perpPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "optionPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setVolShockParams",
-    "inputs": [
-      {
-        "name": "_volShockParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.VolShockParameters",
-        "components": [
-          {
-            "name": "volRangeUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "volRangeDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "shortTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "longTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "dteFloor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
     "name": "collaterals",
     "inputs": [
       {
@@ -22514,6 +21541,41 @@
         "name": "IMHaircut",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getBasisContingencyParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib_2.BasisContingencyParameters",
+        "components": [
+          {
+            "name": "scenarioSpotUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "scenarioSpotDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContAddFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContMultFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
       }
     ],
     "stateMutability": "view"
@@ -22616,6 +21678,61 @@
   },
   {
     "type": "function",
+    "name": "getOtherContingencyParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib_2.OtherContingencyParameters",
+        "components": [
+          {
+            "name": "pegLossThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "pegLossFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confMargin",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "MMPerpPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "IMPerpPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "MMOptionPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "IMOptionPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "getSkewShockParams",
     "inputs": [],
     "outputs": [
@@ -22663,6 +21780,51 @@
             "name": "volParamScale",
             "type": "int256",
             "internalType": "int256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getVolShockParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib_2.VolShockParameters",
+        "components": [
+          {
+            "name": "volRangeUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "volRangeDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "shortTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "longTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "dteFloor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "minVolUpShock",
+            "type": "uint256",
+            "internalType": "uint256"
           }
         ]
       }
@@ -23158,6 +22320,67 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getAccountLib",
+    "inputs": [
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IPMRMLib_2"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setLibOverride",
+    "inputs": [
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "_libOverride",
+        "type": "address",
+        "internalType": "contract IPMRMLib_2"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "LibOverrideUpdated",
+    "inputs": [
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "indexed": true,
+        "internalType": "uint256"
+      },
+      {
+        "name": "libOverride",
+        "type": "address",
+        "indexed": false,
+        "internalType": "contract IPMRMLib_2"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "PM21_NotAllowedToChangeLib",
+    "inputs": []
   },
   {
     "type": "function",
@@ -23687,302 +22910,6 @@
     "type": "constructor",
     "inputs": [
       {
-        "name": "_subAccounts",
-        "type": "address",
-        "internalType": "contract ISubAccounts"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "aggregatedFunding",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "disable",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "frozenPerpPrice",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "fundingConvergencePeriod",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getFundingRate",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "fundingRate",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "impactAskPriceFeed",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "impactBidPriceFeed",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "isDisabled",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "lastFundingPaidAt",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "maxRatePerHour",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "minRatePerHour",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "perpFeed",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "positions",
-    "inputs": [
-      {
-        "name": "accountId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "lastMarkPrice",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "funding",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "pnl",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "lastAggregatedFunding",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "lastFundingPaid",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "realizeAccountPNL",
-    "inputs": [
-      {
-        "name": "accountId",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setConvergencePeriod",
-    "inputs": [
-      {
-        "name": "_fundingConvergencePeriod",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setImpactFeeds",
-    "inputs": [
-      {
-        "name": "_impactAskPriceFeed",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      },
-      {
-        "name": "_impactBidPriceFeed",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setPerpFeed",
-    "inputs": [
-      {
-        "name": "_perpFeed",
-        "type": "address",
-        "internalType": "contract ISpotDiffFeed"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setRateBounds",
-    "inputs": [
-      {
-        "name": "_maxAbsRatePerHour",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setStaticInterestRate",
-    "inputs": [
-      {
-        "name": "_staticInterestRate",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "staticInterestRate",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "int256",
-        "internalType": "int256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "constructor",
-    "inputs": [
-      {
         "name": "initialOwner",
         "type": "address",
         "internalType": "address"
@@ -24123,32 +23050,6 @@
     "stateMutability": "view"
   },
   {
-    "type": "function",
-    "name": "setStandardManager",
-    "inputs": [
-      {
-        "name": "srm",
-        "type": "address",
-        "internalType": "contract IStandardManager"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "standardManager",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IStandardManager"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
     "type": "error",
     "name": "SafeCastOverflowedIntDowncast",
     "inputs": [
@@ -24184,237 +23085,6 @@
         "internalType": "uint256"
       }
     ]
-  },
-  {
-    "type": "constructor",
-    "inputs": [
-      {
-        "name": "_subAccounts",
-        "type": "address",
-        "internalType": "contract ISubAccounts"
-      },
-      {
-        "name": "_cashAsset",
-        "type": "address",
-        "internalType": "contract ICashAsset"
-      },
-      {
-        "name": "accountManager",
-        "type": "address",
-        "internalType": "contract IManager"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "donate",
-    "inputs": [
-      {
-        "name": "stableAmount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "isWhitelisted",
-    "inputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "payCashInsolvency",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "recoverERC20",
-    "inputs": [
-      {
-        "name": "tokenAddress",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "recipient",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "tokenAmount",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "requestPayout",
-    "inputs": [
-      {
-        "name": "targetAccount",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "cashAmountNeeded",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "cashAmountPaid",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "setWhitelistModule",
-    "inputs": [
-      {
-        "name": "module",
-        "type": "address",
-        "internalType": "address"
-      },
-      {
-        "name": "whitelisted",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "stableAsset",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "address",
-        "internalType": "contract IERC20Metadata"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "withdraw",
-    "inputs": [
-      {
-        "name": "stableAmount",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "recipient",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
-    "type": "function",
-    "name": "handleOps",
-    "inputs": [
-      {
-        "name": "ops",
-        "type": "tuple[]",
-        "internalType": "struct UserOperation[]",
-        "components": [
-          {
-            "name": "sender",
-            "type": "address",
-            "internalType": "address"
-          },
-          {
-            "name": "nonce",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "initCode",
-            "type": "bytes",
-            "internalType": "bytes"
-          },
-          {
-            "name": "callData",
-            "type": "bytes",
-            "internalType": "bytes"
-          },
-          {
-            "name": "callGasLimit",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "verificationGasLimit",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "preVerificationGas",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "maxFeePerGas",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "maxPriorityFeePerGas",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "paymasterAndData",
-            "type": "bytes",
-            "internalType": "bytes"
-          },
-          {
-            "name": "signature",
-            "type": "bytes",
-            "internalType": "bytes"
-          }
-        ]
-      },
-      {
-        "name": "beneficiary",
-        "type": "address",
-        "internalType": "address payable"
-      }
-    ],
-    "outputs": [],
-    "stateMutability": "nonpayable"
   },
   {
     "type": "constructor",
@@ -25740,6 +24410,17 @@
         "name": "tradeId",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_subAccounts",
+        "type": "address",
+        "internalType": "contract ISubAccounts"
       }
     ],
     "stateMutability": "nonpayable"
@@ -36870,675 +35551,6 @@
     "inputs": []
   },
   {
-    "type": "function",
-    "name": "BORROW_ENABLED",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "bool",
-        "internalType": "bool"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "CASH_SM_FEE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "FORWARD_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "FWD_MAX_EXPIRY",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "IMPACT_PRICE_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "MAX_ACCOUNT_SIZE_PMRM",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "MAX_ACCOUNT_SIZE_SRM",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "MIN_OI_FEE",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "OI_FEE_BPS",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "PERP_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "PERP_MAX_PERCENT_DIFF",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "SETTLEMENT_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "SPOT_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "STABLE_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "VOL_HEARTBEAT",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint64",
-        "internalType": "uint64"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
-    "name": "getDefaultAuctionParam",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "param",
-        "type": "tuple",
-        "internalType": "struct IDutchAuction.AuctionParams",
-        "components": [
-          {
-            "name": "startingMtMPercentage",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "fastAuctionCutoffPercentage",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "fastAuctionLength",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "slowAuctionLength",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "insolventAuctionLength",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "liquidatorFeeRate",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "bufferMarginPercentage",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getDefaultInterestRateModel",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "minRate",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "rateMultiplier",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "highRateMultiplier",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "optimalUtil",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getDefaultScenarios",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "",
-        "type": "tuple[]",
-        "internalType": "struct IPMRM.Scenario[]",
-        "components": [
-          {
-            "name": "spotShock",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "volShock",
-            "type": "IPMRM.VolShockDirection",
-            "internalType": "enum IPMRM.VolShockDirection"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getPMRMCaps",
-    "inputs": [
-      {
-        "name": "market",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "perpCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "optionCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "baseCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getPMRMParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "basisContParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.BasisContingencyParameters",
-        "components": [
-          {
-            "name": "scenarioSpotUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "scenarioSpotDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContAddFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basisContMultFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "otherContParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.OtherContingencyParameters",
-        "components": [
-          {
-            "name": "pegLossThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "pegLossFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "confMargin",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "basePercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "perpPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "optionPercent",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "marginParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.MarginParameters",
-        "components": [
-          {
-            "name": "imFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateMultScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "rateAddScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "baseStaticDiscount",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "volShockParams",
-        "type": "tuple",
-        "internalType": "struct IPMRMLib.VolShockParameters",
-        "components": [
-          {
-            "name": "volRangeUp",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "volRangeDown",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "shortTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "longTermPower",
-            "type": "int256",
-            "internalType": "int256"
-          },
-          {
-            "name": "dteFloor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getPerpParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "staticInterestRate",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "fundingRateCap",
-        "type": "int256",
-        "internalType": "int256"
-      },
-      {
-        "name": "fundingConvergencePeriod",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getSRMCaps",
-    "inputs": [
-      {
-        "name": "market",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "perpCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "optionCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      },
-      {
-        "name": "baseCap",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getSRMDepegParams",
-    "inputs": [],
-    "outputs": [
-      {
-        "name": "depegParams",
-        "type": "tuple",
-        "internalType": "struct IStandardManager.DepegParams",
-        "components": [
-          {
-            "name": "threshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "depegFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "getSRMParams",
-    "inputs": [
-      {
-        "name": "market",
-        "type": "string",
-        "internalType": "string"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "perpMarginRequirements",
-        "type": "tuple",
-        "internalType": "struct IStandardManager.PerpMarginRequirements",
-        "components": [
-          {
-            "name": "mmPerpReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "imPerpReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "optionMarginParams",
-        "type": "tuple",
-        "internalType": "struct IStandardManager.OptionMarginParams",
-        "components": [
-          {
-            "name": "maxSpotReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "minSpotReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "mmCallSpotReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "mmPutSpotReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "MMPutMtMReq",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "unpairedIMScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "unpairedMMScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "mmOffsetScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "oracleContingencyParams",
-        "type": "tuple",
-        "internalType": "struct IStandardManager.OracleContingencyParams",
-        "components": [
-          {
-            "name": "perpThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "optionThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "baseThreshold",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "OCFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      },
-      {
-        "name": "baseMarginParams",
-        "type": "tuple",
-        "internalType": "struct IStandardManager.BaseMarginParams",
-        "components": [
-          {
-            "name": "marginFactor",
-            "type": "uint256",
-            "internalType": "uint256"
-          },
-          {
-            "name": "IMScale",
-            "type": "uint256",
-            "internalType": "uint256"
-          }
-        ]
-      }
-    ],
-    "stateMutability": "pure"
-  },
-  {
-    "type": "function",
-    "name": "run",
-    "inputs": [],
-    "outputs": [],
-    "stateMutability": "nonpayable"
-  },
-  {
     "type": "error",
     "name": "ERC1155InsufficientBalance",
     "inputs": [
@@ -37641,79 +35653,57 @@
     ]
   },
   {
-    "type": "function",
-    "name": "sendMessage",
+    "type": "constructor",
     "inputs": [
       {
-        "name": "_target",
+        "name": "_subAccounts",
         "type": "address",
-        "internalType": "address"
+        "internalType": "contract ISubAccounts"
       },
       {
-        "name": "_message",
-        "type": "bytes",
-        "internalType": "bytes"
-      },
-      {
-        "name": "_gasLimit",
-        "type": "uint32",
-        "internalType": "uint32"
+        "name": "_cash",
+        "type": "address",
+        "internalType": "contract ICashAsset"
       }
     ],
-    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
     "type": "function",
-    "name": "xDomainMessageSender",
-    "inputs": [],
+    "name": "OIFeeRateBPS",
+    "inputs": [
+      {
+        "name": "asset",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
     "outputs": [
       {
         "name": "",
-        "type": "address",
-        "internalType": "address"
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
     "stateMutability": "view"
   },
   {
-    "type": "event",
-    "name": "FailedRelayedMessage",
+    "type": "function",
+    "name": "setOIFeeRateBPS",
     "inputs": [
       {
-        "name": "msgHash",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
-      }
-    ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "RelayedMessage",
-    "inputs": [
+        "name": "asset",
+        "type": "address",
+        "internalType": "address"
+      },
       {
-        "name": "msgHash",
-        "type": "bytes32",
-        "indexed": false,
-        "internalType": "bytes32"
+        "name": "newFeeRate",
+        "type": "uint256",
+        "internalType": "uint256"
       }
     ],
-    "anonymous": false
-  },
-  {
-    "type": "event",
-    "name": "SentMessage",
-    "inputs": [
-      {
-        "name": "message",
-        "type": "bytes",
-        "indexed": false,
-        "internalType": "bytes"
-      }
-    ],
-    "anonymous": false
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -38191,25 +36181,6 @@
   },
   {
     "type": "function",
-    "name": "nonces",
-    "inputs": [
-      {
-        "name": "owner",
-        "type": "address",
-        "internalType": "address"
-      }
-    ],
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256",
-        "internalType": "uint256"
-      }
-    ],
-    "stateMutability": "view"
-  },
-  {
-    "type": "function",
     "name": "maxDeposit",
     "inputs": [
       {
@@ -38281,6 +36252,402 @@
     "type": "error",
     "name": "LRF_InvalidConfidence",
     "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "SpotDiffCapUpdated",
+    "inputs": [
+      {
+        "name": "spotDiffCap",
+        "type": "uint256",
+        "indexed": false,
+        "internalType": "uint256"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "event",
+    "name": "SpotDiffUpdated",
+    "inputs": [
+      {
+        "name": "spotDiff",
+        "type": "int96",
+        "indexed": false,
+        "internalType": "int96"
+      },
+      {
+        "name": "confidence",
+        "type": "uint96",
+        "indexed": false,
+        "internalType": "uint96"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "LSDF_InvalidConfidence",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "LSDF_InvalidSpotDiffCap",
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "SpotPriceUpdated",
+    "inputs": [
+      {
+        "name": "spot",
+        "type": "uint96",
+        "indexed": false,
+        "internalType": "uint96"
+      },
+      {
+        "name": "confidence",
+        "type": "uint96",
+        "indexed": false,
+        "internalType": "uint96"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "LSF_InvalidConfidence",
+    "inputs": []
+  },
+  {
+    "type": "event",
+    "name": "VolDataUpdated",
+    "inputs": [
+      {
+        "name": "expiry",
+        "type": "uint64",
+        "indexed": true,
+        "internalType": "uint64"
+      },
+      {
+        "name": "volDetails",
+        "type": "tuple",
+        "indexed": false,
+        "internalType": "struct ILyraVolFeed.VolDetails",
+        "components": [
+          {
+            "name": "SVI_a",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "SVI_b",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "SVI_rho",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "SVI_m",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "SVI_sigma",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "SVI_fwd",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "SVI_refTau",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "confidence",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "timestamp",
+            "type": "uint64",
+            "internalType": "uint64"
+          }
+        ]
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "LVF_InvalidConfidence",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "LVF_InvalidVolDataTimestamp",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "LVF_MissingExpiryData",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "name": "getResult",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "result",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "confidence",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_minRate",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "_rateMultiplier",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "_highRateMultiplier",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "_optimalUtil",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "highRateMultiplier",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "minRate",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "optimalUtil",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "rateMultiplier",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "confidence",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getInterestRate",
+    "inputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "rate",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int64",
+        "internalType": "int64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setRate",
+    "inputs": [
+      {
+        "name": "_rate",
+        "type": "int64",
+        "internalType": "int64"
+      },
+      {
+        "name": "_confidence",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "event",
+    "name": "RateUpdated",
+    "inputs": [
+      {
+        "name": "rate",
+        "type": "int64",
+        "indexed": false,
+        "internalType": "int64"
+      },
+      {
+        "name": "confidence",
+        "type": "uint64",
+        "indexed": false,
+        "internalType": "uint64"
+      }
+    ],
+    "anonymous": false
+  },
+  {
+    "type": "error",
+    "name": "LRFS_StaticRateOutOfRange",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "name": "setSpotDiffCap",
+    "inputs": [
+      {
+        "name": "_spotDiffCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "spotDiffCap",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "spotDiffDetails",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "spotDiff",
+        "type": "int96",
+        "internalType": "int96"
+      },
+      {
+        "name": "confidence",
+        "type": "uint64",
+        "internalType": "uint64"
+      },
+      {
+        "name": "timestamp",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -38383,6 +36750,540 @@
     "anonymous": false
   },
   {
+    "type": "error",
+    "name": "SVI_InvalidParameters",
+    "inputs": []
+  },
+  {
+    "type": "error",
+    "name": "SVI_NoForwardPrice",
+    "inputs": []
+  },
+  {
+    "type": "function",
+    "name": "setSpotDiff",
+    "inputs": [
+      {
+        "name": "_spotDiff",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "_confidence",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "spotDiff",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "submitData",
+    "inputs": [
+      {
+        "name": "managerData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "getStaticDiscountParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.MarginParameters",
+        "components": [
+          {
+            "name": "imFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateMultScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateAddScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "baseStaticDiscount",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "setBasisContingencyParams",
+    "inputs": [
+      {
+        "name": "_basisContParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.BasisContingencyParameters",
+        "components": [
+          {
+            "name": "scenarioSpotUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "scenarioSpotDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContAddFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContMultFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setMarginParams",
+    "inputs": [
+      {
+        "name": "_marginParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.MarginParameters",
+        "components": [
+          {
+            "name": "imFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateMultScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateAddScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "baseStaticDiscount",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setOtherContingencyParams",
+    "inputs": [
+      {
+        "name": "_otherContParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.OtherContingencyParameters",
+        "components": [
+          {
+            "name": "pegLossThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "pegLossFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confMargin",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basePercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "perpPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "optionPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setVolShockParams",
+    "inputs": [
+      {
+        "name": "_volShockParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.VolShockParameters",
+        "components": [
+          {
+            "name": "volRangeUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "volRangeDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "shortTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "longTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "dteFloor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "aggregatedFunding",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "disable",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "frozenPerpPrice",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "fundingConvergencePeriod",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getFundingRate",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "fundingRate",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "impactAskPriceFeed",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "impactBidPriceFeed",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "isDisabled",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "lastFundingPaidAt",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "maxRatePerHour",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "minRatePerHour",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "perpFeed",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "positions",
+    "inputs": [
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "lastMarkPrice",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "funding",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "pnl",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "lastAggregatedFunding",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "lastFundingPaid",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "realizeAccountPNL",
+    "inputs": [
+      {
+        "name": "accountId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setConvergencePeriod",
+    "inputs": [
+      {
+        "name": "_fundingConvergencePeriod",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setImpactFeeds",
+    "inputs": [
+      {
+        "name": "_impactAskPriceFeed",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      },
+      {
+        "name": "_impactBidPriceFeed",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setPerpFeed",
+    "inputs": [
+      {
+        "name": "_perpFeed",
+        "type": "address",
+        "internalType": "contract ISpotDiffFeed"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setRateBounds",
+    "inputs": [
+      {
+        "name": "_maxAbsRatePerHour",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setStaticInterestRate",
+    "inputs": [
+      {
+        "name": "_staticInterestRate",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "staticInterestRate",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
     "type": "function",
     "name": "getSharePrice",
     "inputs": [],
@@ -38474,6 +37375,188 @@
     "inputs": []
   },
   {
+    "type": "function",
+    "name": "setStandardManager",
+    "inputs": [
+      {
+        "name": "srm",
+        "type": "address",
+        "internalType": "contract IStandardManager"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "standardManager",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IStandardManager"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "constructor",
+    "inputs": [
+      {
+        "name": "_subAccounts",
+        "type": "address",
+        "internalType": "contract ISubAccounts"
+      },
+      {
+        "name": "_cashAsset",
+        "type": "address",
+        "internalType": "contract ICashAsset"
+      },
+      {
+        "name": "accountManager",
+        "type": "address",
+        "internalType": "contract IManager"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "donate",
+    "inputs": [
+      {
+        "name": "stableAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "isWhitelisted",
+    "inputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "payCashInsolvency",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "recoverERC20",
+    "inputs": [
+      {
+        "name": "tokenAddress",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "tokenAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "requestPayout",
+    "inputs": [
+      {
+        "name": "targetAccount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "cashAmountNeeded",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "cashAmountPaid",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setWhitelistModule",
+    "inputs": [
+      {
+        "name": "module",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "whitelisted",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "stableAsset",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "address",
+        "internalType": "contract IERC20Metadata"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "withdraw",
+    "inputs": [
+      {
+        "name": "stableAmount",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "recipient",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
     "type": "constructor",
     "inputs": [
       {
@@ -38511,6 +37594,104 @@
         "internalType": "contract IERC20"
       }
     ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "accessList",
+    "inputs": [
+      {
+        "name": "access",
+        "type": "tuple[]",
+        "internalType": "struct VmSafe.AccessListItem[]",
+        "components": [
+          {
+            "name": "target",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "storageKeys",
+            "type": "bytes32[]",
+            "internalType": "bytes32[]"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "assumeNoRevert",
+    "inputs": [
+      {
+        "name": "potentialReverts",
+        "type": "tuple[]",
+        "internalType": "struct VmSafe.PotentialRevert[]",
+        "components": [
+          {
+            "name": "reverter",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "partialMatch",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "revertData",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "assumeNoRevert",
+    "inputs": [
+      {
+        "name": "potentialRevert",
+        "type": "tuple",
+        "internalType": "struct VmSafe.PotentialRevert",
+        "components": [
+          {
+            "name": "reverter",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "partialMatch",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "revertData",
+            "type": "bytes",
+            "internalType": "bytes"
+          }
+        ]
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "attachBlob",
+    "inputs": [
+      {
+        "name": "blob",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
@@ -38555,6 +37736,109 @@
   },
   {
     "type": "function",
+    "name": "attachDelegation",
+    "inputs": [
+      {
+        "name": "signedDelegation",
+        "type": "tuple",
+        "internalType": "struct VmSafe.SignedDelegation",
+        "components": [
+          {
+            "name": "v",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "r",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "s",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "nonce",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "implementation",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      },
+      {
+        "name": "crossChain",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "bound",
+    "inputs": [
+      {
+        "name": "current",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "min",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "max",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "bound",
+    "inputs": [
+      {
+        "name": "current",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "min",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "max",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "contains",
     "inputs": [
       {
@@ -38575,6 +37859,357 @@
         "internalType": "bool"
       }
     ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "cool",
+    "inputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "coolSlot",
+    "inputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "slot",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "constructorArgs",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "constructorArgs",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "salt",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "deployCode",
+    "inputs": [
+      {
+        "name": "artifactPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "constructorArgs",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "value",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "deployedAddress",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "eip712HashStruct",
+    "inputs": [
+      {
+        "name": "bindingsPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "typeName",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "abiEncodedData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "typeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "eip712HashStruct",
+    "inputs": [
+      {
+        "name": "typeNameOrDefinition",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "abiEncodedData",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "typeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "eip712HashType",
+    "inputs": [
+      {
+        "name": "bindingsPath",
+        "type": "string",
+        "internalType": "string"
+      },
+      {
+        "name": "typeName",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "typeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "eip712HashType",
+    "inputs": [
+      {
+        "name": "typeNameOrDefinition",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "typeHash",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "eip712HashTypedData",
+    "inputs": [
+      {
+        "name": "jsonData",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "digest",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "expectCreate",
+    "inputs": [
+      {
+        "name": "bytecode",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "deployer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "expectCreate2",
+    "inputs": [
+      {
+        "name": "bytecode",
+        "type": "bytes",
+        "internalType": "bytes"
+      },
+      {
+        "name": "deployer",
+        "type": "address",
+        "internalType": "address"
+      }
+    ],
+    "outputs": [],
     "stateMutability": "nonpayable"
   },
   {
@@ -38791,6 +38426,177 @@
     ],
     "outputs": [],
     "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "foundryVersionAtLeast",
+    "inputs": [
+      {
+        "name": "version",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "foundryVersionCmp",
+    "inputs": [
+      {
+        "name": "version",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "int256",
+        "internalType": "int256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "fromRlp",
+    "inputs": [
+      {
+        "name": "rlp",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "data",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getChain",
+    "inputs": [
+      {
+        "name": "chainAlias",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "chain",
+        "type": "tuple",
+        "internalType": "struct VmSafe.Chain",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "chainId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "chainAlias",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "rpcUrl",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getChain",
+    "inputs": [
+      {
+        "name": "chainId",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "chain",
+        "type": "tuple",
+        "internalType": "struct VmSafe.Chain",
+        "components": [
+          {
+            "name": "name",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "chainId",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "chainAlias",
+            "type": "string",
+            "internalType": "string"
+          },
+          {
+            "name": "rpcUrl",
+            "type": "string",
+            "internalType": "string"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getEvmVersion",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "evm",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getRawBlockHeader",
+    "inputs": [
+      {
+        "name": "blockNumber",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "rlpHeader",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "view"
   },
   {
     "type": "function",
@@ -38817,6 +38623,89 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getStorageAccesses",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "storageAccesses",
+        "type": "tuple[]",
+        "internalType": "struct VmSafe.StorageAccess[]",
+        "components": [
+          {
+            "name": "account",
+            "type": "address",
+            "internalType": "address"
+          },
+          {
+            "name": "slot",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "isWrite",
+            "type": "bool",
+            "internalType": "bool"
+          },
+          {
+            "name": "previousValue",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "newValue",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "reverted",
+            "type": "bool",
+            "internalType": "bool"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getStorageSlots",
+    "inputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "variableName",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "slots",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "interceptInitcode",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "noAccessList",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   },
   {
     "type": "function",
@@ -38861,6 +38750,88 @@
   },
   {
     "type": "function",
+    "name": "resolveEnv",
+    "inputs": [
+      {
+        "name": "input",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setArbitraryStorage",
+    "inputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "overwrite",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setEvmVersion",
+    "inputs": [
+      {
+        "name": "evm",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "setSeed",
+    "inputs": [
+      {
+        "name": "seed",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "shuffle",
+    "inputs": [
+      {
+        "name": "array",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "signAndAttachDelegation",
     "inputs": [
       {
@@ -38872,6 +38843,118 @@
         "name": "privateKey",
         "type": "uint256",
         "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "signedDelegation",
+        "type": "tuple",
+        "internalType": "struct VmSafe.SignedDelegation",
+        "components": [
+          {
+            "name": "v",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "r",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "s",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "nonce",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "implementation",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "signAndAttachDelegation",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "nonce",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "signedDelegation",
+        "type": "tuple",
+        "internalType": "struct VmSafe.SignedDelegation",
+        "components": [
+          {
+            "name": "v",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "r",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "s",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "nonce",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "implementation",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "signAndAttachDelegation",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "crossChain",
+        "type": "bool",
+        "internalType": "bool"
       }
     ],
     "outputs": [
@@ -38963,6 +39046,176 @@
   },
   {
     "type": "function",
+    "name": "signDelegation",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "crossChain",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "signedDelegation",
+        "type": "tuple",
+        "internalType": "struct VmSafe.SignedDelegation",
+        "components": [
+          {
+            "name": "v",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "r",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "s",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "nonce",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "implementation",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "signDelegation",
+    "inputs": [
+      {
+        "name": "implementation",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "nonce",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "signedDelegation",
+        "type": "tuple",
+        "internalType": "struct VmSafe.SignedDelegation",
+        "components": [
+          {
+            "name": "v",
+            "type": "uint8",
+            "internalType": "uint8"
+          },
+          {
+            "name": "r",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "s",
+            "type": "bytes32",
+            "internalType": "bytes32"
+          },
+          {
+            "name": "nonce",
+            "type": "uint64",
+            "internalType": "uint64"
+          },
+          {
+            "name": "implementation",
+            "type": "address",
+            "internalType": "address"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "signWithNonceUnsafe",
+    "inputs": [
+      {
+        "name": "privateKey",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "digest",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "nonce",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "v",
+        "type": "uint8",
+        "internalType": "uint8"
+      },
+      {
+        "name": "r",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      },
+      {
+        "name": "s",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "sort",
+    "inputs": [
+      {
+        "name": "array",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256[]",
+        "internalType": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
     "name": "startPrank",
     "inputs": [
       {
@@ -39004,6 +39257,193 @@
   },
   {
     "type": "function",
+    "name": "stopRecord",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "toRlp",
+    "inputs": [
+      {
+        "name": "data",
+        "type": "bytes[]",
+        "internalType": "bytes[]"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bytes",
+        "internalType": "bytes"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "warmSlot",
+    "inputs": [
+      {
+        "name": "target",
+        "type": "address",
+        "internalType": "address"
+      },
+      {
+        "name": "slot",
+        "type": "bytes32",
+        "internalType": "bytes32"
+      }
+    ],
+    "outputs": [],
+    "stateMutability": "nonpayable"
+  },
+  {
+    "type": "function",
+    "name": "BORROW_ENABLED",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "bool",
+        "internalType": "bool"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "CASH_SM_FEE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "FORWARD_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "FWD_MAX_EXPIRY",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "IMPACT_PRICE_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_ACCOUNT_SIZE_PMRM",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MAX_ACCOUNT_SIZE_SRM",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "MIN_OI_FEE",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "OI_FEE_BPS",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "PERP_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "PERP_MAX_PERCENT_DIFF",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
     "name": "RATE_HEARTBEAT",
     "inputs": [],
     "outputs": [
@@ -39014,6 +39454,136 @@
       }
     ],
     "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SETTLEMENT_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "SPOT_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "STABLE_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "VOL_HEARTBEAT",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "uint64",
+        "internalType": "uint64"
+      }
+    ],
+    "stateMutability": "view"
+  },
+  {
+    "type": "function",
+    "name": "getDefaultAuctionParam",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "param",
+        "type": "tuple",
+        "internalType": "struct IDutchAuction.AuctionParams",
+        "components": [
+          {
+            "name": "startingMtMPercentage",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "fastAuctionCutoffPercentage",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "fastAuctionLength",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "slowAuctionLength",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "insolventAuctionLength",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "liquidatorFeeRate",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "bufferMarginPercentage",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getDefaultInterestRateModel",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "minRate",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "rateMultiplier",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "highRateMultiplier",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "optimalUtil",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
   },
   {
     "type": "function",
@@ -39039,6 +39609,31 @@
             "name": "dampeningFactor",
             "type": "uint256",
             "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getDefaultScenarios",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "",
+        "type": "tuple[]",
+        "internalType": "struct IPMRM.Scenario[]",
+        "components": [
+          {
+            "name": "spotShock",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "volShock",
+            "type": "IPMRM.VolShockDirection",
+            "internalType": "enum IPMRM.VolShockDirection"
           }
         ]
       }
@@ -39257,5 +39852,376 @@
       }
     ],
     "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getPMRMCaps",
+    "inputs": [
+      {
+        "name": "market",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perpCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "optionCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "baseCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getPMRMParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "basisContParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.BasisContingencyParameters",
+        "components": [
+          {
+            "name": "scenarioSpotUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "scenarioSpotDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContAddFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basisContMultFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "otherContParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.OtherContingencyParameters",
+        "components": [
+          {
+            "name": "pegLossThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "pegLossFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "confMargin",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "basePercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "perpPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "optionPercent",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "marginParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.MarginParameters",
+        "components": [
+          {
+            "name": "imFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateMultScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "rateAddScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "baseStaticDiscount",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "volShockParams",
+        "type": "tuple",
+        "internalType": "struct IPMRMLib.VolShockParameters",
+        "components": [
+          {
+            "name": "volRangeUp",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "volRangeDown",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "shortTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "longTermPower",
+            "type": "int256",
+            "internalType": "int256"
+          },
+          {
+            "name": "dteFloor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getPerpParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "staticInterestRate",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "fundingRateCap",
+        "type": "int256",
+        "internalType": "int256"
+      },
+      {
+        "name": "fundingConvergencePeriod",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getSRMCaps",
+    "inputs": [
+      {
+        "name": "market",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perpCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "optionCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      },
+      {
+        "name": "baseCap",
+        "type": "uint256",
+        "internalType": "uint256"
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getSRMDepegParams",
+    "inputs": [],
+    "outputs": [
+      {
+        "name": "depegParams",
+        "type": "tuple",
+        "internalType": "struct IStandardManager.DepegParams",
+        "components": [
+          {
+            "name": "threshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "depegFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "getSRMParams",
+    "inputs": [
+      {
+        "name": "market",
+        "type": "string",
+        "internalType": "string"
+      }
+    ],
+    "outputs": [
+      {
+        "name": "perpMarginRequirements",
+        "type": "tuple",
+        "internalType": "struct IStandardManager.PerpMarginRequirements",
+        "components": [
+          {
+            "name": "mmPerpReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "imPerpReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "optionMarginParams",
+        "type": "tuple",
+        "internalType": "struct IStandardManager.OptionMarginParams",
+        "components": [
+          {
+            "name": "maxSpotReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "minSpotReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "mmCallSpotReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "mmPutSpotReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "MMPutMtMReq",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "unpairedIMScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "unpairedMMScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "mmOffsetScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "oracleContingencyParams",
+        "type": "tuple",
+        "internalType": "struct IStandardManager.OracleContingencyParams",
+        "components": [
+          {
+            "name": "perpThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "optionThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "baseThreshold",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "OCFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      },
+      {
+        "name": "baseMarginParams",
+        "type": "tuple",
+        "internalType": "struct IStandardManager.BaseMarginParams",
+        "components": [
+          {
+            "name": "marginFactor",
+            "type": "uint256",
+            "internalType": "uint256"
+          },
+          {
+            "name": "IMScale",
+            "type": "uint256",
+            "internalType": "uint256"
+          }
+        ]
+      }
+    ],
+    "stateMutability": "pure"
+  },
+  {
+    "type": "function",
+    "name": "run",
+    "inputs": [],
+    "outputs": [],
+    "stateMutability": "nonpayable"
   }
 ]
