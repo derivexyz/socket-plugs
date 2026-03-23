@@ -50,4 +50,5 @@ export enum Tokens {
   USDH = "USDH",
   jitoSOL = "jitoSOL",
   cbADA = "cbADA",
+  BTC = "BTC",
 }

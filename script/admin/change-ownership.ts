@@ -217,12 +217,12 @@ async function checkAndTransferOwnership(addresses: SBAddresses | STAddresses) {
 
 export const main = async () => {
   try {
-    // const { tokens } = getConfigs();
+    const { tokens } = getConfigs();
     printConfigs();
     const addresses = getProjectAddresses();
     const addressesToCheck = {};
     for (const chain of Object.keys(addresses)) {
-      for (const token of Object.keys(addresses[chain])) {
+      for (const token of tokens) {
         if (addresses[chain][token]) {
           if (!addressesToCheck[chain]) {
             addressesToCheck[chain] = {};
