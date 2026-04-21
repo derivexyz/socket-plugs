@@ -5,6 +5,7 @@ export enum Tokens {
   USDCE = "USDC.e",
   USDC = "USDC",
   WETH = "WETH",
+  WETHstrat = "WETH-strat",
   WBTC = "WBTC",
   USDT = "USDT",
   SNX = "SNX",

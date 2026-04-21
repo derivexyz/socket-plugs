@@ -259,19 +259,20 @@ export const main = async () => {
           await execute(contract, "updateLimitParams", [updateLimitParams], chain);
           console.log(`[${token}] Setting vault limits for chain ${chain} - COMPLETED`);
 
-          if (
-            addr.isAppChain &&
-            connectorAddresses.length &&
-            connectorPoolIds.length
-          ) {
-            await execute(
-              contract,
-              "updateConnectorPoolId",
-              [connectorAddresses, connectorPoolIds],
-              chain
-            );
-            console.log(`[${token}] Setting pool Ids for chain ${chain} - COMPLETED`);
-          }
+          // if (
+          //   addr.isAppChain &&
+          //   connectorAddresses.length &&
+          //   connectorPoolIds.length
+          // ) {
+          //   await execute(
+          //     contract,
+          //     "updateConnectorPoolId",
+          //     [connectorAddresses, connectorPoolIds],
+          //     chain
+          //   );
+          //   console.log(`[${token}] Setting pool Ids for chain ${chain} - COMPLETED`);
+          //   console.log(contract.address, [connectorAddresses, connectorPoolIds]);
+          // }
         }
       })
     );

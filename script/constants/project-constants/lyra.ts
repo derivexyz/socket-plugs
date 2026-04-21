@@ -168,6 +168,20 @@ const pc: ProjectConstants = {
         },
       },
     },
+    [Tokens.WETHstrat]: {
+      appChain: ChainSlug.LYRA,
+      nonAppChains: {
+        [ChainSlug.MAINNET]: {
+          [IntegrationTypes.fast]: {
+            depositLimit: "5000",
+            depositRate: "0.05787037",
+            withdrawLimit: "17",
+            withdrawRate: "0.000787",
+            poolCount: 0,
+          },
+        },
+      },
+    },
     [Tokens.WBTC]: {
       appChain: ChainSlug.LYRA,
       nonAppChains: {
