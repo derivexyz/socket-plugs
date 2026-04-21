@@ -314,8 +314,15 @@ export const updateLimitsAndPoolId = async (
       );
 
       // mint/lock/deposit limits
-      const sendingLimit = getLimitBN(it, chain, token, true);
-      const sendingRate = getRateBN(it, chain, token, true);
+      // For LYRA (chain 957), use the sibling's limits with directions swapped:
+      // LYRA sending limit = sibling's receiving limit, and vice versa.
+      const isLyraChain = chain === ChainSlug.LYRA;
+      const sendingLimit = isLyraChain
+        ? getLimitBN(it, sibling, token, false)
+        : getLimitBN(it, chain, token, true);
+      const sendingRate = isLyraChain
+        ? getRateBN(it, sibling, token, false)
+        : getRateBN(it, chain, token, true);
 
       if (
         !sendingLimit.eq(sendingParams["maxLimit"]) ||
@@ -333,8 +340,12 @@ export const updateLimitsAndPoolId = async (
         );
       }
 
-      const receivingLimit = getLimitBN(it, chain, token, false);
-      const receivingRate = getRateBN(it, chain, token, false);
+      const receivingLimit = isLyraChain
+        ? getLimitBN(it, sibling, token, true)
+        : getLimitBN(it, chain, token, false);
+      const receivingRate = isLyraChain
+        ? getRateBN(it, sibling, token, true)
+        : getRateBN(it, chain, token, false);
 
       if (
         !receivingLimit.eq(receivingParams["maxLimit"]) ||
@@ -378,6 +389,7 @@ export const updateLimitsAndPoolId = async (
   }
 
   if (updateLimitParams.length) {
+    console.log(updateLimitParams);
     await execute(
       hookContract,
       "updateLimitParams",

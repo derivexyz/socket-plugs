@@ -65,5 +65,6 @@ export const getRateBN = (
   isSending: boolean
 ): BigNumber => {
   let limitBN = getLimitBN(it, chain, token, isSending);
-  return limitBN.div(86400);
+  // refresh every 6hrs
+  return limitBN.div(86400).mul(4);
 };

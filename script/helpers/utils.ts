@@ -100,6 +100,9 @@ export async function getOwnerAndNominee(contract: Contract) {
 export const ZERO_ADDRESS = "0x0000000000000000000000000000000000000000";
 
 export const execSummary: string[] = [];
+export const execPerChain: {
+  [chain: string]: string[];
+} = {};
 
 export async function execute(
   contract: Contract,
@@ -128,6 +131,12 @@ export async function execute(
         await contract.populateTransaction[method](...args)
       ).data.slice(2)}");`
     );
+    execPerChain[chain] = execPerChain[chain] ?? [];
+    execPerChain[chain].push(
+      `${contract.address},0,${
+        (await contract.populateTransaction[method](...args)).data
+      }}`
+    );
   } else {
     if ((await contract.owner()) !== getOwner()) {
       console.log("!!!! Not owner of contract, skipping");
@@ -149,6 +158,13 @@ export const printExecSummary = () => {
     console.log("=".repeat(100));
     execSummary.forEach((t) => console.log(t));
     console.log("=".repeat(100));
+  }
+  console.log();
+  for (const chain of Object.keys(execPerChain)) {
+    console.log(`\n${chain}`);
+    for (const fn of execPerChain[chain]) {
+      console.log(fn);
+    }
   }
 };
 
