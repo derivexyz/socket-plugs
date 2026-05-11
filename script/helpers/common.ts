@@ -329,7 +329,7 @@ export const updateLimitsAndPoolId = async (
         !sendingRate.eq(sendingParams["ratePerSecond"])
       ) {
         updateLimitParams.push([
-          true,
+          false,
           itConnectorAddress,
           sendingLimit,
           sendingRate,
@@ -352,7 +352,7 @@ export const updateLimitsAndPoolId = async (
         !receivingRate.eq(receivingParams["ratePerSecond"])
       ) {
         updateLimitParams.push([
-          false,
+          true,
           itConnectorAddress,
           receivingLimit,
           receivingRate,

@@ -190,7 +190,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.BASE]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "1000000000",
-              receivingLimit: "1000000000",
+              receivingLimit: "5",
               poolCount: 0,
             },
           },
@@ -805,8 +805,8 @@ export const pc: ProjectConstants = {
         limitsAndPoolId: {
           [ChainSlug.LYRA]: {
             [IntegrationTypes.fast]: {
-              sendingLimit: "50000",
-              receivingLimit: "100000000",
+              sendingLimit: null,
+              receivingLimit: null,
               poolCount: 0,
             },
           },

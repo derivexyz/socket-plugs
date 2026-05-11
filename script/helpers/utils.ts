@@ -135,7 +135,7 @@ export async function execute(
     execPerChain[chain].push(
       `${contract.address},0,${
         (await contract.populateTransaction[method](...args)).data
-      }}`
+      }`
     );
   } else {
     if ((await contract.owner()) !== getOwner()) {

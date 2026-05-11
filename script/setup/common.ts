@@ -103,12 +103,5 @@ export const validateRPC = async (chainSlug: ChainSlug, rpcUrl: string) => {
 export const initialLimitsForSuperbridge: {
   [token in Tokens]?: { sendingLimit: number; receivingLimit: number };
 } = {
-  [Tokens.ETH]: { sendingLimit: 10.0, receivingLimit: 10.0 },
-  [Tokens.WETH]: { sendingLimit: 10.0, receivingLimit: 10.0 },
-  [Tokens.WSTETH]: { sendingLimit: 10.0, receivingLimit: 10.0 },
-  [Tokens.USDC]: { sendingLimit: 100_000.0, receivingLimit: 100_000.0 },
-  [Tokens.USDCE]: { sendingLimit: 100_000.0, receivingLimit: 100_000.0 },
-  [Tokens.USDT]: { sendingLimit: 100_000.0, receivingLimit: 100_000.0 },
-  [Tokens.DAI]: { sendingLimit: 100_000.0, receivingLimit: 100_000.0 },
-  [Tokens.WBTC]: { sendingLimit: 1.0, receivingLimit: 1.0 },
+
 };
