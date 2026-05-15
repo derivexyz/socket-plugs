@@ -34,8 +34,8 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "350000",
-            withdrawRate: "16.2",
+            withdrawLimit: "1500000",
+            withdrawRate: "69.44",
             poolCount: 0,
           },
           [IntegrationTypes.native]: {

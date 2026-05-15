@@ -66,7 +66,9 @@ function getIntegrationTypeConstsForToken(
 ) {
   const pci = pc.nonAppChains[nonAppChain]?.[it];
   if (!pci)
-    throw new Error(`invalid integration for nonAppChain ${nonAppChain}, it ${it}`);
+    throw new Error(
+      `invalid integration for nonAppChain ${nonAppChain}, it ${it}`
+    );
   return pci;
 }
 
@@ -130,7 +132,9 @@ export const main = async () => {
 
     // Load project-level constants for all tokens at once
     const allProjectConstants: Partial<Record<Tokens, ProjectTokenConstants>> =
-      require(`../../constants/project-constants/${getProject()}`)?.[getMode()] ?? {};
+      require(`../../constants/project-constants/${getProject()}`)?.[
+        getMode()
+      ] ?? {};
 
     // Collect all chains that appear across any token
     const allChainsSet = new Set<ChainSlug>();
@@ -160,7 +164,9 @@ export const main = async () => {
             parseInt(k)
           ) as ChainSlug[];
 
-          console.log(`[${token}] Configuring chain ${chain} for siblings ${siblingSlugs}`);
+          console.log(
+            `[${token}] Configuring chain ${chain} for siblings ${siblingSlugs}`
+          );
 
           await connectForToken(
             addr,
@@ -179,7 +185,10 @@ export const main = async () => {
               console.log(`[${token}] Controller not found on chain ${chain}`);
               continue;
             }
-            contract = await getInstance(SuperBridgeContracts.Controller, a.Controller);
+            contract = await getInstance(
+              SuperBridgeContracts.Controller,
+              a.Controller
+            );
           } else {
             const a = addr as NonAppChainAddresses;
             if (!a.Vault) {
@@ -215,36 +224,78 @@ export const main = async () => {
 
               let lockParams;
               if (addr.isAppChain) {
-                lockParams = await contract.functions.getMintLimitParams(itConnectorAddress);
+                lockParams = await contract.functions.getMintLimitParams(
+                  itConnectorAddress
+                );
               } else {
-                lockParams = await contract.functions.getLockLimitParams(itConnectorAddress);
+                lockParams = await contract.functions.getLockLimitParams(
+                  itConnectorAddress
+                );
               }
 
               let unlockParams;
               if (addr.isAppChain) {
-                unlockParams = await contract.functions.getBurnLimitParams(itConnectorAddress);
+                unlockParams = await contract.functions.getBurnLimitParams(
+                  itConnectorAddress
+                );
               } else {
-                unlockParams = await contract.functions.getUnlockLimitParams(itConnectorAddress);
+                unlockParams = await contract.functions.getUnlockLimitParams(
+                  itConnectorAddress
+                );
               }
 
-              const mintLimit = getLimitBNForToken(it, nonAppChainForLimits, true, pc, token);
-              const mintRate = getRateBNForToken(it, nonAppChainForLimits, true, pc, token);
+              const mintLimit = getLimitBNForToken(
+                it,
+                nonAppChainForLimits,
+                true,
+                pc,
+                token
+              );
+              const mintRate = getRateBNForToken(
+                it,
+                nonAppChainForLimits,
+                true,
+                pc,
+                token
+              );
 
               if (
                 !mintLimit.eq(lockParams[0]["maxLimit"]) ||
                 !mintRate.eq(lockParams[0]["ratePerSecond"])
               ) {
-                updateLimitParams.push([true, itConnectorAddress, mintLimit, mintRate]);
+                updateLimitParams.push([
+                  true,
+                  itConnectorAddress,
+                  mintLimit,
+                  mintRate,
+                ]);
               }
 
-              const burnLimit = getLimitBNForToken(it, nonAppChainForLimits, false, pc, token);
-              const burnRate = getRateBNForToken(it, nonAppChainForLimits, false, pc, token);
+              const burnLimit = getLimitBNForToken(
+                it,
+                nonAppChainForLimits,
+                false,
+                pc,
+                token
+              );
+              const burnRate = getRateBNForToken(
+                it,
+                nonAppChainForLimits,
+                false,
+                pc,
+                token
+              );
 
               if (
                 !burnLimit.eq(unlockParams[0]["maxLimit"]) ||
                 !burnRate.eq(unlockParams[0]["ratePerSecond"])
               ) {
-                updateLimitParams.push([false, itConnectorAddress, burnLimit, burnRate]);
+                updateLimitParams.push([
+                  false,
+                  itConnectorAddress,
+                  burnLimit,
+                  burnRate,
+                ]);
               }
 
               if (chain === pc.appChain) {
@@ -256,8 +307,15 @@ export const main = async () => {
 
           if (!updateLimitParams.length) continue;
 
-          await execute(contract, "updateLimitParams", [updateLimitParams], chain);
-          console.log(`[${token}] Setting vault limits for chain ${chain} - COMPLETED`);
+          await execute(
+            contract,
+            "updateLimitParams",
+            [updateLimitParams],
+            chain
+          );
+          console.log(
+            `[${token}] Setting vault limits for chain ${chain} - COMPLETED`
+          );
 
           // if (
           //   addr.isAppChain &&
@@ -302,7 +360,10 @@ const connectForToken = async (
   pc: ProjectTokenConstants
 ) => {
   try {
-    console.log(`[${token}] connecting plugs for chain ${chain}, siblings`, siblingSlugs);
+    console.log(
+      `[${token}] connecting plugs for chain ${chain}, siblings`,
+      siblingSlugs
+    );
 
     for (const sibling of siblingSlugs) {
       const localConnectorAddresses: ConnectorAddresses | undefined =
@@ -332,9 +393,9 @@ const connectForToken = async (
 
         console.log(getAddresses(chain, getMode()).integrations[sibling]);
 
-        const switchboard =
-          getAddresses(chain, getMode()).integrations[sibling][integration]
-            ?.switchboard;
+        const switchboard = getAddresses(chain, getMode()).integrations[
+          sibling
+        ][integration]?.switchboard;
 
         if (!switchboard) {
           console.log(
@@ -342,7 +403,10 @@ const connectForToken = async (
           );
         }
 
-        let config = await socketContract.getPlugConfig(localConnectorPlug, sibling);
+        let config = await socketContract.getPlugConfig(
+          localConnectorPlug,
+          sibling
+        );
 
         if (config[0].toLowerCase() === siblingConnectorPlug.toLowerCase()) {
           console.log("already set, confirming ", { config });
@@ -350,10 +414,18 @@ const connectForToken = async (
         }
 
         const connectorContract = (
-          await getInstance(SuperBridgeContracts.ConnectorPlug, localConnectorPlug)
+          await getInstance(
+            SuperBridgeContracts.ConnectorPlug,
+            localConnectorPlug
+          )
         ).connect(socketSigner);
 
-        await execute(connectorContract, "connect", [siblingConnectorPlug, switchboard], chain);
+        await execute(
+          connectorContract,
+          "connect",
+          [siblingConnectorPlug, switchboard],
+          chain
+        );
       }
     }
   } catch (error) {
