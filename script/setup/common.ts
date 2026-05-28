@@ -102,6 +102,4 @@ export const validateRPC = async (chainSlug: ChainSlug, rpcUrl: string) => {
 
 export const initialLimitsForSuperbridge: {
   [token in Tokens]?: { sendingLimit: number; receivingLimit: number };
-} = {
-
-};
+} = {};

@@ -53,4 +53,4 @@ export enum Tokens {
   BTC = "BTC",
   XAUT = "XAUT",
   FXRP = "FXRP",
-  }
+}
