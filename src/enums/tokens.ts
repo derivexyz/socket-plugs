@@ -51,4 +51,6 @@ export enum Tokens {
   jitoSOL = "jitoSOL",
   cbADA = "cbADA",
   BTC = "BTC",
-}
+  XAUT = "XAUT",
+  FXRP = "FXRP",
+  }

@@ -31,6 +31,7 @@ export const ExistingTokenAddresses: {
     [Tokens.AAVE]: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
     [Tokens.MUSD]: "0xdd468a1ddc392dcdbef6db6e34e89aa338f9f186",
     [Tokens.PUFETH]: "0xd9a442856c234a39a81a089c06451ebaa4306a72",
+    [Tokens.XAUT]: "0x68749665ff8d2d112fa859aa293f07a622782f38",
   },
   [ChainSlug.OPTIMISM]: {
     [Tokens.USDC]: "0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757",
@@ -184,6 +185,8 @@ export const ExistingTokenAddresses: {
     [Tokens.jitoSOL]: "0xF09c01E0E8c7F5b5F98777D8C6eAc851ad0b273F",
     [Tokens.cbADA]: "0xE493aba1e0E012a4c8311dD92AA1C2b68b2883B6",
     [Tokens.BTC]: "0xbE15d93d0673335a3FbFD8C17CD091EEaF960916",
+    [Tokens.XAUT]: "0x4D530F376C30F092AA86eF77C02e5911d072e255",
+    [Tokens.FXRP]: "0xce7543F244B1CAEc480b865ea87aB82d0F8D6f6a",
   },
   [ChainSlug.AEVO_TESTNET]: {
     [Tokens.USDC]: "0x4D435C00E09034ec2113F63088CCD0be0a0fd06e",
@@ -232,6 +235,8 @@ export const ExistingTokenAddresses: {
     [Tokens.jitoSOL]: "0x3F5896B38715D076BA377c15729f5B99e9926741",
     [Tokens.cbADA]: "0x378Fe6E5F914899387F0Ce88B0676dB2F47ea3F4",
     [Tokens.BTC]: "0xF1493F3602Ab0fC576375a20D7E4B4714DB4422d",
+    [Tokens.XAUT]: "0x968b2976439F7385Fc90143B2e59898DCcd6c869",
+    [Tokens.FXRP]: "0x9a9392e35a4d27Fd636457fCe751976A6c9F9ec2",
   },
   [ChainSlug.LYRA]: {
     [Tokens.USDC]: "0x6879287835A86F50f784313dBEd5E5cCC5bb8481",
@@ -275,6 +280,7 @@ export const ExistingTokenAddresses: {
     [Tokens.LBTCPS]: "0x5Fc48A32437Ff4BBab2A22646c3c9344ba003971",
     [Tokens.LBTCCS]: "0xbCab1f8BbA323BC55EA8cfaC34edAcf8DBE92dD4",
     [Tokens.LBTCB]: "0x2104654d6Da663961a86AC3Cf1751981C5dc62E8",
+    [Tokens.XAUT]: "0x83b4a2A6F254fa33Ae3F25054a53a5E77b93b2dA",
   },
   [ChainSlug.HYPEREVM]: {
     [Tokens.HYPE]: "0x5555555555555555555555555555555555555555",

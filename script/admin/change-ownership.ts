@@ -18,7 +18,14 @@ const chainToExpectedOwner = {
 };
 
 let nominateTxs = {};
-let msTxs = {};
+let msTxs: { [chain: string]: [string, string][] } = {};
+
+const RESCUE_ROLE = ethers.utils.keccak256(
+  ethers.utils.toUtf8Bytes("RESCUE_ROLE")
+);
+const ownableInterface = new ethers.utils.Interface(OWNABLE_ABI);
+const CLAIM_OWNER_CALLDATA = "0x3bd1adec";
+const ACCEPT_OWNERSHIP_CALLDATA = "0x79ba5097";
 
 async function getOwnerAndNominee(contract: ethers.Contract) {
   const owner = await contract.owner();
@@ -28,6 +35,56 @@ async function getOwnerAndNominee(contract: ethers.Contract) {
   } catch (error) {}
   const pendingOwner = await contract.pendingOwner();
   return [owner, pendingOwner, 1];
+}
+
+async function checkAndRevokeRescueRole(
+  contract: ethers.Contract,
+  chain: ChainSlug,
+  owner: string,
+  contractLabel: string
+) {
+  if (chain === ChainSlug.BLAST) return;
+  const deployer = getOwner();
+  let hasRole: boolean;
+  try {
+    hasRole = await contract.hasRole(RESCUE_ROLE, deployer);
+  } catch (error) {
+    console.warn(
+      `hasRole call failed for ${contract.address} on chain ${chain}: ${
+        (error as Error).message
+      }`
+    );
+    return;
+  }
+  if (!hasRole) return;
+
+  console.log(
+    `Deployer ${deployer} has RESCUE_ROLE on ${contract.address} (chain ${chain}, ${contractLabel})`
+  );
+
+  const expectedOwner = chainToExpectedOwner[chain];
+  if (expectedOwner && deployer.toLowerCase() === expectedOwner.toLowerCase()) {
+    // Deployer == expected multisig owner; intentional, nothing to do.
+    return;
+  }
+
+  if (owner.toLowerCase() === deployer.toLowerCase()) {
+    const tx = await contract.revokeRole(RESCUE_ROLE, deployer, {
+      ...overrides[chain],
+    });
+    console.log(`Revoking RESCUE_ROLE from deployer, tx hash: ${tx.hash}`);
+    await tx.wait();
+  } else {
+    const calldata = ownableInterface.encodeFunctionData("revokeRole", [
+      RESCUE_ROLE,
+      deployer,
+    ]);
+    if (!msTxs[chain]) msTxs[chain] = [];
+    msTxs[chain].push([contract.address, calldata]);
+    console.log(
+      `Queued multi-sig revokeRole(RESCUE_ROLE, ${deployer}) for ${contract.address}`
+    );
+  }
 }
 
 async function checkAndChange(
@@ -68,7 +125,7 @@ async function checkAndChange(
     }
     msTxs[chain].push([
       contract.address,
-      type === 0 ? "claimOwner()" : "acceptOwnership()",
+      type === 0 ? CLAIM_OWNER_CALLDATA : ACCEPT_OWNERSHIP_CALLDATA,
     ]);
   }
 
@@ -79,6 +136,13 @@ async function checkAndChange(
     owner,
     nominee,
     type
+  );
+
+  await checkAndRevokeRescueRole(
+    contract,
+    chain,
+    owner,
+    `${contractType} for ${token}`
   );
 }
 
@@ -191,7 +255,7 @@ async function checkChainOwnership(
           }
           msTxs[chain].push([
             contract.address,
-            type === 0 ? "claimOwner()" : "acceptOwnership()",
+            type === 0 ? CLAIM_OWNER_CALLDATA : ACCEPT_OWNERSHIP_CALLDATA,
           ]);
         }
 
@@ -202,6 +266,13 @@ async function checkChainOwnership(
           owner,
           nominee,
           type
+        );
+
+        await checkAndRevokeRescueRole(
+          contract,
+          +chain,
+          owner,
+          `Connector for ${token}, conn-chain: ${connectorChain}, conn-type: ${connectorType}`
         );
       }
     }
@@ -240,15 +311,7 @@ export const main = async () => {
           `\nMulti-sig transactions to be executed on chain ${chain} by expected owner ${chainToExpectedOwner[chain]}:`
         );
         for (const tx of msTxs[chain]) {
-          console.log(
-            `${tx[0]},0,${
-              tx[1] == "claimOwner()"
-                ? "0x3bd1adec"
-                : tx[1] == "acceptOwnership()"
-                ? "0x79ba5097"
-                : `ERRORERROR ${tx[1]} ERRORERROR`
-            }`
-          );
+          console.log(`${tx[0]},0,${tx[1]}`);
         }
       }
     }

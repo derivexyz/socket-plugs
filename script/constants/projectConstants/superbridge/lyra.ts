@@ -781,7 +781,7 @@ export const pc: ProjectConstants = {
         limitsAndPoolId: {
           [ChainSlug.LYRA]: {
             [IntegrationTypes.fast]: {
-              sendingLimit: "14000",
+              sendingLimit: "360000",
               receivingLimit: "100000000",
               poolCount: 0,
             },
@@ -790,7 +790,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.HYPEREVM]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000000",
-              receivingLimit: "14000",
+              receivingLimit: "360000",
               poolCount: 0,
             },
           },
@@ -814,6 +814,30 @@ export const pc: ProjectConstants = {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000000",
               receivingLimit: "50000",
+              poolCount: 0,
+            },
+          },
+        },
+      },
+    },
+    [Tokens.XAUT]: {
+      controllerChains: [ChainSlug.LYRA],
+      vaultChains: [ChainSlug.MAINNET],
+      hook: {
+        hookType: Hooks.LYRA_TSA_SHAREHANDLER_DEPOSIT_HOOK,
+        limitsAndPoolId: {
+          [ChainSlug.LYRA]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100",
+              receivingLimit: "100000000",
+              poolCount: 0,
+            },
+          },
+
+          [ChainSlug.MAINNET]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100000000",
+              receivingLimit: "100",
               poolCount: 0,
             },
           },
