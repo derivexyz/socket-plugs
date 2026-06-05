@@ -323,7 +323,9 @@ export const updateLimitsAndPoolId = async (
       const sendingRate = isLyraChain
         ? getRateBN(it, sibling, token, false)
         : getRateBN(it, chain, token, true);
-
+      console.log(
+        `Current ${sendingParams["maxLimit"]}(${sendingParams["ratePerSecond"]}) -> ${sendingLimit}(${sendingRate})`
+      );
       if (
         !sendingLimit.eq(sendingParams["maxLimit"]) ||
         !sendingRate.eq(sendingParams["ratePerSecond"])
@@ -346,7 +348,9 @@ export const updateLimitsAndPoolId = async (
       const receivingRate = isLyraChain
         ? getRateBN(it, sibling, token, true)
         : getRateBN(it, chain, token, false);
-
+      console.log(
+        `Current ${receivingParams["maxLimit"]}(${receivingParams["ratePerSecond"]}) -> ${receivingLimit}(${receivingRate})`
+      );
       if (
         !receivingLimit.eq(receivingParams["maxLimit"]) ||
         !receivingRate.eq(receivingParams["ratePerSecond"])
