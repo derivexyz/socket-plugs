@@ -6,6 +6,13 @@ import {
 import { Tokens } from "../../../src";
 import { ProjectConstants } from "../types";
 
+function withdrawLimit(limit: number, digits: number = 6) {
+  return {
+    withdrawLimit: limit.toFixed(digits),
+    withdrawRate: (limit / 60 / 60 / 6).toFixed(digits),
+  };
+}
+
 const pc: ProjectConstants = {
   [DeploymentMode.PROD]: {
     [Tokens.USDC]: {
@@ -16,17 +23,15 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "100000",
-            withdrawRate: "4.62",
             poolCount: 1,
+            ...withdrawLimit(100_000),
           },
         },
         [ChainSlug.ARBITRUM]: {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "525000",
-            withdrawRate: "24.33",
+            ...withdrawLimit(300_000),
             poolCount: 1,
           },
         },
@@ -34,8 +39,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "1500000",
-            withdrawRate: "69.44",
+            ...withdrawLimit(200_000),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
@@ -50,8 +54,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "36000",
-            withdrawRate: "1.666",
+            ...withdrawLimit(200_000),
             poolCount: 1,
           },
         },
@@ -65,8 +68,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "0",
             depositRate: "0",
-            withdrawLimit: "10000",
-            withdrawRate: "0.5",
+            ...withdrawLimit(0),
             poolCount: 0,
           },
         },
@@ -74,8 +76,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "0",
             depositRate: "0",
-            withdrawLimit: "1",
-            withdrawRate: "0.0001",
+            ...withdrawLimit(0),
             poolCount: 0,
           },
         },
@@ -88,8 +89,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "10000",
-            withdrawRate: "0.4629",
+            ...withdrawLimit(100_000),
             poolCount: 0,
           },
         },
@@ -97,8 +97,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "10000",
-            withdrawRate: "0.4629",
+            ...withdrawLimit(100_000),
             poolCount: 0,
           },
         },
@@ -106,8 +105,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "10000000",
             depositRate: "115.74",
-            withdrawLimit: "37000",
-            withdrawRate: "1.712",
+            ...withdrawLimit(100_000),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
@@ -127,8 +125,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "5000",
             depositRate: "0.05787037",
-            withdrawLimit: "35",
-            withdrawRate: "0.00162",
+            ...withdrawLimit(35),
             poolCount: 0,
           },
         },
@@ -136,8 +133,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "5000",
             depositRate: "0.05787037",
-            withdrawLimit: "15",
-            withdrawRate: "0.00069",
+            ...withdrawLimit(35),
             poolCount: 0,
           },
         },
@@ -145,8 +141,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "5000",
             depositRate: "0.05787037",
-            withdrawLimit: "7",
-            withdrawRate: "0.00033",
+            ...withdrawLimit(35),
             poolCount: 0,
           },
         },
@@ -154,8 +149,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "5000",
             depositRate: "0.05787037",
-            withdrawLimit: "5.5",
-            withdrawRate: "0.0002546",
+            ...withdrawLimit(35),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
@@ -175,8 +169,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "5000",
             depositRate: "0.05787037",
-            withdrawLimit: "17",
-            withdrawRate: "0.000787",
+            ...withdrawLimit(17),
             poolCount: 0,
           },
         },
@@ -189,8 +182,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "3",
-            withdrawRate: "0.000139",
+            ...withdrawLimit(4, 8),
             poolCount: 0,
           },
         },
@@ -198,8 +190,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "3",
-            withdrawRate: "0.000139",
+            ...withdrawLimit(1.5, 8),
             poolCount: 0,
           },
         },
@@ -207,8 +198,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "0.1",
-            withdrawRate: "0.0000046",
+            ...withdrawLimit(1.5, 8),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
@@ -228,8 +218,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "0",
             depositRate: "0",
-            withdrawLimit: "1",
-            withdrawRate: "0.00115741",
+            ...withdrawLimit(1),
             poolCount: 0,
           },
         },
@@ -237,8 +226,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "0",
             depositRate: "0",
-            withdrawLimit: "1",
-            withdrawRate: "0.00115741",
+            ...withdrawLimit(1),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
@@ -258,8 +246,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "50",
-            withdrawRate: "0.00231",
+            ...withdrawLimit(65),
             poolCount: 0,
           },
         },
@@ -267,8 +254,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "25",
-            withdrawRate: "0.001157",
+            ...withdrawLimit(45),
             poolCount: 0,
           },
         },
@@ -276,8 +262,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "250",
             depositRate: "0.00289351",
-            withdrawLimit: "3.5",
-            withdrawRate: "0.000162",
+            ...withdrawLimit(45),
             poolCount: 0,
           },
         },
@@ -285,8 +270,7 @@ const pc: ProjectConstants = {
           [IntegrationTypes.fast]: {
             depositLimit: "500",
             depositRate: "0.005787037",
-            withdrawLimit: "0.7",
-            withdrawRate: "0.0000324",
+            ...withdrawLimit(45),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {

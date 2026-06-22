@@ -43,12 +43,14 @@ async function execute(
   method: string,
   args: any[],
   chain: number,
-  optionalOverrides?: any
+  optionalOverrides?: any,
+  description?: string
 ) {
   if (getDryRun()) {
     const calldata = contract.interface.encodeFunctionData(method, args);
     if (!dryRunCalls[chain]) dryRunCalls[chain] = [];
     dryRunCalls[chain].push(`${contract.address},0,${calldata}`);
+    dryRunCalls[chain].push(`${description}`);
   } else {
     let tx = await contract.functions[method](...args, {
       ...overrides[chain],
@@ -204,6 +206,8 @@ export const main = async () => {
           const connectorAddresses: string[] = [];
           const connectorPoolIds: string[] = [];
 
+          let summary = "";
+
           for (const sibling of siblingSlugs) {
             const siblingConnectorAddresses: ConnectorAddresses | undefined =
               connectors[sibling];
@@ -269,6 +273,7 @@ export const main = async () => {
                   mintLimit,
                   mintRate,
                 ]);
+                summary += `${sibling} mint: [${mintLimit} | ${mintRate}/sec] `;
               }
 
               const burnLimit = getLimitBNForToken(
@@ -296,6 +301,7 @@ export const main = async () => {
                   burnLimit,
                   burnRate,
                 ]);
+                summary += `${sibling} burn: [${burnLimit} | ${burnRate}/sec] `;
               }
 
               if (chain === pc.appChain) {
@@ -311,7 +317,9 @@ export const main = async () => {
             contract,
             "updateLimitParams",
             [updateLimitParams],
-            chain
+            chain,
+            undefined,
+            `${chain}-${token}: updateLimitParams ${summary}`
           );
           console.log(
             `[${token}] Setting vault limits for chain ${chain} - COMPLETED`
