@@ -15,6 +15,8 @@ const chainToExpectedOwner = {
   [ChainSlug.MODE]: "0x14232db3852eA44A1be8DB35e82D56191f534D95",
   [ChainSlug.OPTIMISM]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
   [ChainSlug.HYPEREVM]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.FLARE]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
+  [ChainSlug.HEMI]: "0x169a99B9958386a5D91E732Ed08B344946A92391",
 };
 
 let nominateTxs = {};
@@ -294,15 +296,17 @@ export const main = async () => {
     const addressesToCheck = {};
     for (const chain of Object.keys(addresses)) {
       for (const token of tokens) {
+        console.log(chain, token);
         if (addresses[chain][token]) {
           if (!addressesToCheck[chain]) {
             addressesToCheck[chain] = {};
           }
           addressesToCheck[chain][token] = addresses[chain][token];
-          break;
+          continue;
         }
       }
     }
+    console.log(addressesToCheck);
 
     await checkAndTransferOwnership(addressesToCheck);
     if (Object.keys(msTxs).length !== 0) {

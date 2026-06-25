@@ -187,6 +187,7 @@ export const ExistingTokenAddresses: {
     [Tokens.BTC]: "0xbE15d93d0673335a3FbFD8C17CD091EEaF960916",
     [Tokens.XAUT]: "0x4D530F376C30F092AA86eF77C02e5911d072e255",
     [Tokens.FXRP]: "0xce7543F244B1CAEc480b865ea87aB82d0F8D6f6a",
+    [Tokens.HEMIBTC]: "0xfbD11Ee37271Ed7B687007Fe93555b38fAfeEDEA",
   },
   [ChainSlug.AEVO_TESTNET]: {
     [Tokens.USDC]: "0x4D435C00E09034ec2113F63088CCD0be0a0fd06e",
@@ -237,6 +238,7 @@ export const ExistingTokenAddresses: {
     [Tokens.BTC]: "0xF1493F3602Ab0fC576375a20D7E4B4714DB4422d",
     [Tokens.XAUT]: "0x968b2976439F7385Fc90143B2e59898DCcd6c869",
     [Tokens.FXRP]: "0x9a9392e35a4d27Fd636457fCe751976A6c9F9ec2",
+    [Tokens.HEMIBTC]: "0xa7fb07b00f715F14dCcf0C2c207F74a3ec2a5B6D",
   },
   [ChainSlug.LYRA]: {
     [Tokens.USDC]: "0x6879287835A86F50f784313dBEd5E5cCC5bb8481",
@@ -281,10 +283,18 @@ export const ExistingTokenAddresses: {
     [Tokens.LBTCCS]: "0xbCab1f8BbA323BC55EA8cfaC34edAcf8DBE92dD4",
     [Tokens.LBTCB]: "0x2104654d6Da663961a86AC3Cf1751981C5dc62E8",
     [Tokens.XAUT]: "0x83b4a2A6F254fa33Ae3F25054a53a5E77b93b2dA",
+    [Tokens.FXRP]: "0xf88f38e0b96894eCa6aC1017038505dc6abD5073",
+    [Tokens.HEMIBTC]: "0x30cCDB5d54a2FdBf367e49c537a6d6A5290818C1",
   },
   [ChainSlug.HYPEREVM]: {
     [Tokens.HYPE]: "0x5555555555555555555555555555555555555555",
     [Tokens.KHYPE]: "0xfd739d4e423301ce9385c1fb8850539d657c296d",
     [Tokens.USDH]: "0x111111a1a0667d36bd57c0a9f569b98057111111",
+  },
+  [ChainSlug.FLARE]: {
+    [Tokens.FXRP]: "0xad552a648c74d49e10027ab8a618a3ad4901c5be",
+  },
+  [ChainSlug.HEMI]: {
+    [Tokens.HEMIBTC]: "0xaa40c0c7644e0b2b224509571e10ad20d9c4ef28",
   },
 };

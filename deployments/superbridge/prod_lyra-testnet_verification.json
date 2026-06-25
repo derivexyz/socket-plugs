@@ -1,6 +1,42 @@
 {
   "901": [
     [
+      "0xC58A05165b3b63C36Ec3BB88a0940c9EC1538b8d",
+      "ConnectorPlug",
+      "contracts/ConnectorPlug.sol",
+      [
+        "0xb167024AF8260E86211548e34A63e2D825C2E16d",
+        "0xFDC28fA368c33DEC7853d63B65FC5Cfe01B212fc",
+        11155420
+      ]
+    ],
+    [
+      "0x4425Fa32Ea556F0cF894F8dB3b31C6940f737c5d",
+      "LyraTSAShareHandlerDepositHook",
+      "contracts/hooks/lyra/LyraTSAShareHandlerHooks.sol",
+      [
+        "0x000000A94C901AA5d4da1157B2Dd1c4c6b69815e",
+        "0xb167024AF8260E86211548e34A63e2D825C2E16d",
+        true
+      ]
+    ],
+    [
+      "0xb167024AF8260E86211548e34A63e2D825C2E16d",
+      "Controller",
+      "contracts/bridge/Controller.sol",
+      [
+        "0xa7fb07b00f715F14dCcf0C2c207F74a3ec2a5B6D"
+      ]
+    ],
+    [
+      "0x047897C9b557257EeC5De244b5d437371F635934",
+      "Controller",
+      "contracts/bridge/Controller.sol",
+      [
+        "0xa7fb07b00f715F14dCcf0C2c207F74a3ec2a5B6D"
+      ]
+    ],
+    [
       "0x2d5d010d6cB25409357C3Be7fDd0f87Aa7DdB3CF",
       "ConnectorPlug",
       "contracts/ConnectorPlug.sol",
@@ -1132,6 +1168,34 @@
     ]
   ],
   "11155420": [
+    [
+      "0xAbc5B82EE058135eE7Db83aBC2d396F8CEB31374",
+      "ConnectorPlug",
+      "contracts/ConnectorPlug.sol",
+      [
+        "0x0A0fBBcDebc1CD70d2866bf03838b5a4a19f0119",
+        "0xEA59E2b1539b514290dD3dCEa989Ea36279aC6F2",
+        901
+      ]
+    ],
+    [
+      "0xb78a7a5D8e85FD3DD843696311bd8A1B8F977621",
+      "LyraTSAShareHandlerDepositHook",
+      "contracts/hooks/lyra/LyraTSAShareHandlerHooks.sol",
+      [
+        "0x000000A94C901AA5d4da1157B2Dd1c4c6b69815e",
+        "0x0A0fBBcDebc1CD70d2866bf03838b5a4a19f0119",
+        false
+      ]
+    ],
+    [
+      "0x0A0fBBcDebc1CD70d2866bf03838b5a4a19f0119",
+      "Vault",
+      "contracts/bridge/Vault.sol",
+      [
+        "0xfbD11Ee37271Ed7B687007Fe93555b38fAfeEDEA"
+      ]
+    ],
     [
       "0x306538a606dC10652E3c06449fE5fBC0CD3BFA7d",
       "ConnectorPlug",

@@ -72,6 +72,8 @@ const liveNetworks = [
   HardhatChainName.REYA_CRONOS,
   HardhatChainName.REYA,
   HardhatChainName.SYNDR_SEPOLIA_L3,
+  HardhatChainName.HEMI,
+  HardhatChainName.FLARE,
 ];
 
 let hardhatNetworkDetails = {};
@@ -220,6 +222,22 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api.etherscan.io/v2/api?chainid=999",
           browserURL: "https://hyperevmscan.io/",
+        },
+      },
+      {
+        network: "flare-network",
+        chainId: ChainSlugToId[hardhatChainNameToSlug[HardhatChainName.FLARE]],
+        urls: {
+          apiURL: "https://flare-explorer.flare.network/api",
+          browserURL: "https://flare-explorer.flare.network/",
+        },
+      },
+      {
+        network: "hemi",
+        chainId: ChainSlugToId[hardhatChainNameToSlug[HardhatChainName.HEMI]],
+        urls: {
+          apiURL: "https://explorer.hemi.xyz/api",
+          browserURL: "https://explorer.hemi.xyz/",
         },
       },
     ],

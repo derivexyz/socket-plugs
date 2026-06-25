@@ -301,6 +301,17 @@
           "FAST": "0x2d5d010d6cB25409357C3Be7fDd0f87Aa7DdB3CF"
         }
       }
+    },
+    "HEMIBTC": {
+      "isAppChain": true,
+      "MintableToken": "0xa7fb07b00f715F14dCcf0C2c207F74a3ec2a5B6D",
+      "Controller": "0xb167024AF8260E86211548e34A63e2D825C2E16d",
+      "LyraTSAShareHandlerDepositHook": "0x4425Fa32Ea556F0cF894F8dB3b31C6940f737c5d",
+      "connectors": {
+        "11155420": {
+          "FAST": "0xC58A05165b3b63C36Ec3BB88a0940c9EC1538b8d"
+        }
+      }
     }
   },
   "421614": {
@@ -664,6 +675,17 @@
       "connectors": {
         "901": {
           "FAST": "0x306538a606dC10652E3c06449fE5fBC0CD3BFA7d"
+        }
+      }
+    },
+    "HEMIBTC": {
+      "isAppChain": false,
+      "NonMintableToken": "0xfbD11Ee37271Ed7B687007Fe93555b38fAfeEDEA",
+      "Vault": "0x0A0fBBcDebc1CD70d2866bf03838b5a4a19f0119",
+      "LyraTSAShareHandlerDepositHook": "0xb78a7a5D8e85FD3DD843696311bd8A1B8F977621",
+      "connectors": {
+        "901": {
+          "FAST": "0xAbc5B82EE058135eE7Db83aBC2d396F8CEB31374"
         }
       }
     }

@@ -192,22 +192,25 @@ export const verify = async (
     if (chainSlug === 31337) return;
 
     exec(
-      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier sourcify --verifier-url https://sourcify.parsec.finance/verify`
+      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier blockscout --verifier-url https://flare-explorer.flare.network/api`
     );
     console.log(
-      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier sourcify --verifier-url https://sourcify.parsec.finance/verify`
+      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier blockscout --verifier-url https://flare-explorer.flare.network/api`
     );
-    console.log(
-      `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --etherscan-api-key ZGTD4RRB27MBHVD228X1FDHMJUVZ287BH6`
-    );
-
-    console.log("Verifying ", { address, contractName, path, args });
-
-    await run("verify:verify", {
-      address,
-      contract: `${path}:${contractName}`,
-      constructorArguments: args,
-    });
+    // console.log(
+    //   `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --verifier sourcify --verifier-url https://sourcify.parsec.finance/verify`
+    // );
+    // console.log(
+    //   `forge verify-contract ${address} ${contractName} --chain-id ${chainSlug} --etherscan-api-key ZGTD4RRB27MBHVD228X1FDHMJUVZ287BH6`
+    // );
+    //
+    // console.log("Verifying ", { address, contractName, path, args });
+    //
+    // await run("verify:verify", {
+    //   address,
+    //   contract: `${path}:${contractName}`,
+    //   constructorArguments: args,
+    // });
   } catch (error) {
     console.log("Error during verification", error);
   }
