@@ -23,6 +23,7 @@ import {
   isSuperBridge,
   isSuperToken,
   getDryRun,
+  getOwner,
 } from "../constants/config";
 import {
   getLimitBN,
@@ -32,6 +33,7 @@ import {
   isSTVaultChain,
 } from "./projectConstants";
 import { Tokens } from "../../src/enums";
+import { LIMIT_UPDATER_ROLE } from "../constants/roles";
 
 export const updateConnectorStatus = async (
   chain: ChainSlug,
@@ -279,6 +281,11 @@ export const checkAndGrantRole = async (
   }
 };
 
+// Tracks `${chain}-${hookAddress}` grants already emitted this run, so the role is
+// granted at most once even though updateLimitsAndPoolId runs per token (and dry run
+// never updates the on-chain hasRole it would otherwise re-check).
+const grantedLimitUpdaterRole = new Set<string>();
+
 export const updateLimitsAndPoolId = async (
   chain: ChainSlug,
   token: Tokens,
@@ -393,6 +400,34 @@ export const updateLimitsAndPoolId = async (
   }
 
   if (updateLimitParams.length) {
+    // updateLimitParams is gated by LIMIT_UPDATER_ROLE. If the caller lacks it,
+    // emit grantRole first so the batch can set limits (in dry run the grant
+    // calldata is emitted alongside, not skipped).
+    // In dry run the batch is executed by the owner (multisig), so that's the
+    // effective caller; in a live run it's the signer sending the tx.
+    const caller = getDryRun()
+      ? await hookContract.owner()
+      : getSignerFromChainSlug(chain).address;
+    const grantKey = `${chain}-${hookContract.address}`;
+    const callerHasRole = await hookContract.hasRole(
+      LIMIT_UPDATER_ROLE,
+      caller
+    );
+    console.log(
+      `LIMIT_UPDATER_ROLE check: caller=${caller} hook=${hookContract.address} chain=${chain} hasRole=${callerHasRole}`
+    );
+    if (!grantedLimitUpdaterRole.has(grantKey) && !callerHasRole) {
+      grantedLimitUpdaterRole.add(grantKey);
+      console.log(
+        `Granting LIMIT_UPDATER_ROLE to ${caller} on ${hookContract.address} (chain ${chain})`
+      );
+      await execute(
+        hookContract,
+        "grantRole",
+        [LIMIT_UPDATER_ROLE, caller],
+        chain
+      );
+    }
     console.log(updateLimitParams);
     await execute(
       hookContract,
@@ -408,11 +443,29 @@ export const updateLimitsAndPoolId = async (
     connectorAddresses.length &&
     connectorPoolIds.length
   ) {
-    await execute(
-      hookContract,
-      "updateConnectorPoolId",
-      [connectorAddresses, connectorPoolIds],
-      chain
-    );
+    if (getDryRun() || (await callerIsOwner(hookContract, chain))) {
+      await execute(
+        hookContract,
+        "updateConnectorPoolId",
+        [connectorAddresses, connectorPoolIds],
+        chain
+      );
+    } else {
+      console.log(
+        `✗   Signer is not the owner of ${hookContract.address} (chain ${chain}), skipping updateConnectorPoolId.`
+      );
+    }
   }
+};
+
+// updateConnectorPoolId is onlyOwner; verify the signer is the owner before a live
+// send so it surfaces as a clear log instead of a reverted tx (skipped in dry run,
+// which just emits calldata for the owner multisig to execute).
+const callerIsOwner = async (
+  contract: Contract,
+  chain: ChainSlug
+): Promise<boolean> => {
+  const signer = getSignerFromChainSlug(chain);
+  const owner = await contract.owner();
+  return owner === signer.address;
 };

@@ -214,7 +214,31 @@
     }
   },
   "lyra": {
+    "14": {
+      "FXRP": {
+        "isAppChain": false,
+        "NonMintableToken": "0xad552a648c74d49e10027ab8a618a3ad4901c5be",
+        "Vault": "0x8574CBC539c26Df9ec11bA283218268101ff10e1",
+        "LyraTSAShareHandlerDepositHook": "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+        "connectors": {
+          "957": {
+            "FAST": "0xE7603DF191D699d8BD9891b821347dbAb889E5a5"
+          }
+        }
+      }
+    },
     "957": {
+      "FXRP": {
+        "isAppChain": true,
+        "MintableToken": "0xf88f38e0b96894eCa6aC1017038505dc6abD5073",
+        "Controller": "0xA75E8cEd59E569C9980d3724c09250cCbC5A1563",
+        "LyraTSAShareHandlerDepositHook": "0x33BCe9787Cd38D47678675299F5351E86a5cEF0A",
+        "connectors": {
+          "14": {
+            "FAST": "0x95947f904Af89624Dbada6acBcf14376EA338Aa0"
+          }
+        }
+      },
       "HEMIBTC": {
         "isAppChain": true,
         "MintableToken": "0x30cCDB5d54a2FdBf367e49c537a6d6A5290818C1",
