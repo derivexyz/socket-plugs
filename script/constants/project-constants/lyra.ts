@@ -21,7 +21,7 @@ const pc: ProjectConstants = {
       nonAppChains: {
         [ChainSlug.OPTIMISM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             poolCount: 1,
             ...withdrawLimit(100_000),
@@ -29,15 +29,15 @@ const pc: ProjectConstants = {
         },
         [ChainSlug.ARBITRUM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
-            ...withdrawLimit(300_000),
+            ...withdrawLimit(1_000_000),
             poolCount: 1,
           },
         },
         [ChainSlug.MAINNET]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             ...withdrawLimit(200_000),
             poolCount: 0,
@@ -52,7 +52,7 @@ const pc: ProjectConstants = {
         },
         [ChainSlug.BASE]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             ...withdrawLimit(200_000),
             poolCount: 1,
@@ -87,7 +87,7 @@ const pc: ProjectConstants = {
       nonAppChains: {
         [ChainSlug.OPTIMISM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             ...withdrawLimit(100_000),
             poolCount: 0,
@@ -95,7 +95,7 @@ const pc: ProjectConstants = {
         },
         [ChainSlug.ARBITRUM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             ...withdrawLimit(100_000),
             poolCount: 0,
@@ -103,7 +103,7 @@ const pc: ProjectConstants = {
         },
         [ChainSlug.MAINNET]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "10000000",
+            depositLimit: "100000000",
             depositRate: "115.74",
             ...withdrawLimit(100_000),
             poolCount: 0,
@@ -123,32 +123,32 @@ const pc: ProjectConstants = {
       nonAppChains: {
         [ChainSlug.OPTIMISM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "5000",
-            depositRate: "0.05787037",
+            depositLimit: "50000",
+            depositRate: "5.787037",
             ...withdrawLimit(35),
             poolCount: 0,
           },
         },
         [ChainSlug.ARBITRUM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "5000",
-            depositRate: "0.05787037",
+            depositLimit: "50000",
+            depositRate: "5.787037",
             ...withdrawLimit(35),
             poolCount: 0,
           },
         },
         [ChainSlug.BASE]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "5000",
-            depositRate: "0.05787037",
+            depositLimit: "50000",
+            depositRate: "5.787037",
             ...withdrawLimit(35),
             poolCount: 0,
           },
         },
         [ChainSlug.MAINNET]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "5000",
-            depositRate: "0.05787037",
+            depositLimit: "50000",
+            depositRate: "5.787037",
             ...withdrawLimit(35),
             poolCount: 0,
           },
@@ -244,33 +244,33 @@ const pc: ProjectConstants = {
       nonAppChains: {
         [ChainSlug.OPTIMISM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "250",
-            depositRate: "0.00289351",
+            depositLimit: "500000",
+            depositRate: "5.787037",
             ...withdrawLimit(65),
             poolCount: 0,
           },
         },
         [ChainSlug.ARBITRUM]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "250",
-            depositRate: "0.00289351",
-            ...withdrawLimit(45),
+            depositLimit: "500000",
+            depositRate: "5.787037",
+            ...withdrawLimit(2100),
             poolCount: 0,
           },
         },
         [ChainSlug.BASE]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "250",
-            depositRate: "0.00289351",
+            depositLimit: "500000",
+            depositRate: "5.787037",
             ...withdrawLimit(45),
             poolCount: 0,
           },
         },
         [ChainSlug.MAINNET]: {
           [IntegrationTypes.fast]: {
-            depositLimit: "500",
-            depositRate: "0.005787037",
-            ...withdrawLimit(45),
+            depositLimit: "500000",
+            depositRate: "5.787037",
+            ...withdrawLimit(2100),
             poolCount: 0,
           },
           [IntegrationTypes.native]: {
