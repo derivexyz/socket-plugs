@@ -32,6 +32,9 @@ function main() {
     ...recurseArtifacts(path.join(__dirname, "../../../../drv/v2-matching/out"))
   );
   allFiles.push(
+    ...recurseArtifacts(path.join(__dirname, "../../../../drv/v2-aa/out"))
+  );
+  allFiles.push(
     ...recurseArtifacts(
       path.join(__dirname, "../../../../drv/v2-matching/lib/v2-core/out")
     )
