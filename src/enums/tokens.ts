@@ -55,4 +55,4 @@ export enum Tokens {
   FXRP = "FXRP",
   HEMIBTC = "HEMIBTC",
   AUSD = "AUSD",
-  }
+}
