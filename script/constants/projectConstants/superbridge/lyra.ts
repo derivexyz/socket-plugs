@@ -8,6 +8,29 @@ import { Tokens } from "../../../../src/enums";
 
 export const pc: ProjectConstants = {
   [DeploymentMode.PROD]: {
+    [Tokens.AUSD]: {
+      controllerChains: [ChainSlug.LYRA],
+      vaultChains: [ChainSlug.MAINNET],
+      hook: {
+        hookType: Hooks.LYRA_TSA_SHAREHANDLER_DEPOSIT_HOOK,
+        limitsAndPoolId: {
+          [ChainSlug.LYRA]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100000000",
+              receivingLimit: "100000000",
+              poolCount: 0,
+            },
+          },
+          [ChainSlug.MAINNET]: {
+            [IntegrationTypes.fast]: {
+              sendingLimit: "100000000",
+              receivingLimit: "100000000",
+              poolCount: 0,
+            },
+          },
+        },
+      },
+    },
     [Tokens.HEMIBTC]: {
       controllerChains: [ChainSlug.LYRA],
       vaultChains: [ChainSlug.HEMI],
@@ -812,7 +835,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.HYPEREVM]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000000",
-              receivingLimit: "6000",
+              receivingLimit: "20000",
               poolCount: 0,
             },
           },

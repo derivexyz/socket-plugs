@@ -32,6 +32,7 @@ export const ExistingTokenAddresses: {
     [Tokens.MUSD]: "0xdd468a1ddc392dcdbef6db6e34e89aa338f9f186",
     [Tokens.PUFETH]: "0xd9a442856c234a39a81a089c06451ebaa4306a72",
     [Tokens.XAUT]: "0x68749665ff8d2d112fa859aa293f07a622782f38",
+    [Tokens.AUSD]: "0x00000000efe302beaa2b3e6e1b18d08d69a9012a",
   },
   [ChainSlug.OPTIMISM]: {
     [Tokens.USDC]: "0x8e0b7e6062272B5eF4524250bFFF8e5Bd3497757",
@@ -188,6 +189,7 @@ export const ExistingTokenAddresses: {
     [Tokens.XAUT]: "0x4D530F376C30F092AA86eF77C02e5911d072e255",
     [Tokens.FXRP]: "0xce7543F244B1CAEc480b865ea87aB82d0F8D6f6a",
     [Tokens.HEMIBTC]: "0xfbD11Ee37271Ed7B687007Fe93555b38fAfeEDEA",
+    [Tokens.AUSD]: "0xcDaAa2A4A9A06a1F201B078FDC113bfDB7c7d810",
   },
   [ChainSlug.AEVO_TESTNET]: {
     [Tokens.USDC]: "0x4D435C00E09034ec2113F63088CCD0be0a0fd06e",
@@ -239,6 +241,7 @@ export const ExistingTokenAddresses: {
     [Tokens.XAUT]: "0x968b2976439F7385Fc90143B2e59898DCcd6c869",
     [Tokens.FXRP]: "0x9a9392e35a4d27Fd636457fCe751976A6c9F9ec2",
     [Tokens.HEMIBTC]: "0xa7fb07b00f715F14dCcf0C2c207F74a3ec2a5B6D",
+    [Tokens.AUSD]: "0x9931E6cF35D31Bf8d6876a750BE588046bFE55A1",
   },
   [ChainSlug.LYRA]: {
     [Tokens.USDC]: "0x6879287835A86F50f784313dBEd5E5cCC5bb8481",
@@ -285,6 +288,7 @@ export const ExistingTokenAddresses: {
     [Tokens.XAUT]: "0x83b4a2A6F254fa33Ae3F25054a53a5E77b93b2dA",
     [Tokens.FXRP]: "0xf88f38e0b96894eCa6aC1017038505dc6abD5073",
     [Tokens.HEMIBTC]: "0x30cCDB5d54a2FdBf367e49c537a6d6A5290818C1",
+    [Tokens.AUSD]: "0x806a6caccafc01f4CEb6825703C8210ce7E34999",
   },
   [ChainSlug.HYPEREVM]: {
     [Tokens.HYPE]: "0x5555555555555555555555555555555555555555",
