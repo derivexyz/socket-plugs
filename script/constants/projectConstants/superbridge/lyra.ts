@@ -491,14 +491,14 @@ export const pc: ProjectConstants = {
           [ChainSlug.MAINNET]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000",
-              receivingLimit: "0.3",
+              receivingLimit: "1",
               poolCount: 0,
             },
           },
           [ChainSlug.BASE]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000",
-              receivingLimit: "0.3",
+              receivingLimit: "6",
               poolCount: 0,
             },
           },
