@@ -788,7 +788,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.HYPEREVM]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000000",
-              receivingLimit: "6000",
+              receivingLimit: "10000",
               poolCount: 0,
             },
           },
@@ -835,7 +835,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.HYPEREVM]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000000",
-              receivingLimit: "20000",
+              receivingLimit: "15000",
               poolCount: 0,
             },
           },

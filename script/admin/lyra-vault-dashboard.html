@@ -1,0 +1,3098 @@
+<!DOCTYPE html>
+<!--
+  Lyra / Derive vault dashboard (static, single file)
+
+  What it does
+    Reads every Vault in deployments/superbridge/prod_lyra_addresses.json and
+    prod_lyra-old_addresses.json, multicalls each source chain for the vault's
+    token balance, multicalls Derive (957) for the matching connector pool
+    amounts, prices everything through DefiLlama, and classifies how the token
+    on that chain can reach Ethereum L1 (LayerZero OFT / CCTP / CCIP / canonical
+    bridge / issuer) with a time estimate. Anything under 30 minutes is "instant".
+
+  How to open
+    * Serve the repo root and open it over http so it can read the live JSON:
+        python3 -m http.server 8000
+        open http://localhost:8000/script/admin/lyra-vault-dashboard.html
+    * Or open the file directly (file://). It then uses the snapshot embedded
+      below, because browsers block fetch() on file:// pages.
+
+  Refresh the embedded snapshot after changing the deployment JSON
+    python3 - <<'EOF'
+    import json,re
+    p='script/admin/lyra-vault-dashboard.html'
+    snap={n:json.load(open(f'deployments/superbridge/prod_{n}_addresses.json')) for n in ('lyra','lyra-old')}
+    s=open(p).read()
+    s=re.sub(r'(/\*@@DEPLOYMENTS_START@@\*/)[\s\S]*?(/\*@@DEPLOYMENTS_END@@\*/)',lambda m:m.group(1)+json.dumps(snap,separators=(",",":"))+m.group(2),s)
+    open(p,'w').write(s)
+    EOF
+
+  RPC overrides: ?rpc.1=https://... (one per chain id) if a public endpoint misbehaves.
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="color-scheme" content="light dark" />
+    <title>Lyra Vault Ledger</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+    <style>
+      :root {
+        --bg: #f3f4f1;
+        --surface: #ffffff;
+        --surface-2: #e9ebe6;
+        --line: #d5d9d2;
+        --line-strong: #b9bfb8;
+        --ink: #1a1f1c;
+        --ink-2: #4e5652;
+        --ink-3: #7c847f;
+        --accent: #14614f;
+        --accent-ink: #ffffff;
+        --accent-soft: #dcebe5;
+        --row-hover: #f6f8f4;
+
+        --st-instant: #0f7b4a;
+        --st-instant-bg: #ddf3e6;
+        --st-slow: #9a4b0f;
+        --st-slow-bg: #fbe9d6;
+        --st-unknown: #6d5da8;
+        --st-unknown-bg: #ece8f7;
+        --st-l1: #3b4a61;
+        --st-l1-bg: #e5eaf2;
+        --st-error: #b3261e;
+        --st-error-bg: #fbe3e1;
+
+        --sans: "IBM Plex Sans", "Helvetica Neue", Arial, system-ui, sans-serif;
+        --mono: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+        --radius: 6px;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #121513;
+          --surface: #1a1e1b;
+          --surface-2: #232826;
+          --line: #313834;
+          --line-strong: #454d48;
+          --ink: #e6e9e4;
+          --ink-2: #a7afaa;
+          --ink-3: #7f8781;
+          --accent: #4fb89a;
+          --accent-ink: #0d1a15;
+          --accent-soft: #1d3a31;
+          --row-hover: #202522;
+          --st-instant: #5fd39a;
+          --st-instant-bg: #133426;
+          --st-slow: #f0a868;
+          --st-slow-bg: #3c2612;
+          --st-unknown: #b7a9f0;
+          --st-unknown-bg: #2a2545;
+          --st-l1: #a9b8d0;
+          --st-l1-bg: #26303f;
+          --st-error: #ff8a80;
+          --st-error-bg: #3d1f1d;
+        }
+      }
+      :root[data-theme="dark"] {
+        --bg: #121513;
+        --surface: #1a1e1b;
+        --surface-2: #232826;
+        --line: #313834;
+        --line-strong: #454d48;
+        --ink: #e6e9e4;
+        --ink-2: #a7afaa;
+        --ink-3: #7f8781;
+        --accent: #4fb89a;
+        --accent-ink: #0d1a15;
+        --accent-soft: #1d3a31;
+        --row-hover: #202522;
+        --st-instant: #5fd39a;
+        --st-instant-bg: #133426;
+        --st-slow: #f0a868;
+        --st-slow-bg: #3c2612;
+        --st-unknown: #b7a9f0;
+        --st-unknown-bg: #2a2545;
+        --st-l1: #a9b8d0;
+        --st-l1-bg: #26303f;
+        --st-error: #ff8a80;
+        --st-error-bg: #3d1f1d;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--bg);
+        color: var(--ink);
+        font-family: var(--sans);
+        font-size: 14px;
+        line-height: 1.45;
+        padding-block: 28px 48px;
+        padding-inline: clamp(16px, 3vw, 40px);
+      }
+      a {
+        color: var(--accent);
+      }
+      button,
+      select,
+      input {
+        font: inherit;
+        color: inherit;
+      }
+      [hidden] {
+        display: none !important;
+      }
+
+      /* Header */
+      .top {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 16px 24px;
+        margin-bottom: 22px;
+      }
+      .top h1 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+        text-wrap: balance;
+      }
+      .top .sub {
+        margin: 4px 0 0;
+        color: var(--ink-2);
+        max-width: 64ch;
+      }
+      .top .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .btn {
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 7px 12px;
+        cursor: pointer;
+        font-weight: 500;
+      }
+      .btn:hover {
+        border-color: var(--accent);
+      }
+      .btn:focus-visible,
+      select:focus-visible,
+      input:focus-visible,
+      th[data-sort]:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .btn.primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        border-color: var(--accent);
+      }
+      .btn[disabled] {
+        opacity: 0.55;
+        cursor: default;
+      }
+      .stamp {
+        color: var(--ink-3);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+
+      /* KPI tiles */
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      @media (max-width: 1000px) {
+        .tiles {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+      }
+      @media (max-width: 620px) {
+        .tiles {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+      }
+      .tile {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        padding: 14px 16px 12px;
+        min-width: 0;
+      }
+      .tile .label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--ink-2);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        font-weight: 500;
+      }
+      .tile .value {
+        font-size: 26px;
+        font-weight: 600;
+        margin-top: 6px;
+        letter-spacing: -0.01em;
+      }
+      .tile .meta {
+        color: var(--ink-3);
+        font-size: 12px;
+        margin-top: 2px;
+        font-variant-numeric: tabular-nums;
+      }
+      .tile.lead {
+        grid-column: span 1;
+        border-color: var(--accent);
+      }
+      .sw {
+        width: 10px;
+        height: 10px;
+        border-radius: 2px;
+        flex: none;
+      }
+      .sw.instant {
+        background: var(--st-instant);
+      }
+      .sw.slow {
+        background: var(--st-slow);
+      }
+      .sw.unknown {
+        background: var(--st-unknown);
+      }
+      .sw.l1 {
+        background: var(--st-l1);
+      }
+      .sw.total {
+        background: var(--accent);
+      }
+
+      /* Controls */
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 14px;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+      .controls label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: var(--ink-2);
+        font-size: 13px;
+      }
+      .controls select,
+      .controls input[type="search"] {
+        border: 1px solid var(--line-strong);
+        background: var(--surface);
+        border-radius: var(--radius);
+        padding: 6px 8px;
+        min-width: 0;
+      }
+      .controls input[type="search"] {
+        width: 200px;
+      }
+      .controls .count {
+        margin-left: auto;
+        color: var(--ink-3);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+      }
+
+      /* Table */
+      .tablewrap {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: var(--radius);
+        overflow-x: auto;
+      }
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        min-width: 1080px;
+      }
+      thead th {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        background: var(--surface-2);
+        color: var(--ink-2);
+        font-weight: 500;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--line);
+        white-space: nowrap;
+      }
+      th[data-sort] {
+        cursor: pointer;
+        user-select: none;
+      }
+      th[data-sort]:hover {
+        color: var(--ink);
+      }
+      th .dir {
+        display: inline-block;
+        width: 1em;
+        color: var(--accent);
+      }
+      th.num,
+      td.num {
+        text-align: right;
+      }
+      tbody td {
+        padding: 9px 12px;
+        border-bottom: 1px solid var(--line);
+        vertical-align: top;
+      }
+      tbody tr:last-child td {
+        border-bottom: 0;
+      }
+      tbody tr:hover td {
+        background: var(--row-hover);
+      }
+      tbody tr.zero td {
+        color: var(--ink-3);
+      }
+      td.num {
+        font-family: var(--mono);
+        font-size: 13px;
+        font-variant-numeric: tabular-nums;
+        white-space: nowrap;
+      }
+      td .sym {
+        font-weight: 600;
+      }
+      td .alias {
+        color: var(--ink-3);
+        font-size: 12px;
+        margin-left: 4px;
+      }
+      td .addr {
+        display: block;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: var(--ink-3);
+        margin-top: 2px;
+      }
+      td .addr a {
+        color: inherit;
+        text-decoration: none;
+      }
+      td .addr a:hover {
+        text-decoration: underline;
+      }
+      .chip {
+        display: inline-block;
+        padding: 2px 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 500;
+        white-space: nowrap;
+        border: 1px solid transparent;
+      }
+      .chip.dep {
+        background: var(--surface-2);
+        color: var(--ink-2);
+        font-family: var(--mono);
+        font-size: 11px;
+      }
+      .chip.v3-native {
+        background: var(--surface-2);
+        color: var(--ink-2);
+      }
+      .chip.v3-custom {
+        background: var(--accent-soft);
+        color: var(--accent);
+      }
+      .chip.t-instant {
+        background: var(--st-instant-bg);
+        color: var(--st-instant);
+      }
+      .chip.t-slow {
+        background: var(--st-slow-bg);
+        color: var(--st-slow);
+      }
+      .chip.t-unknown {
+        background: var(--st-unknown-bg);
+        color: var(--st-unknown);
+      }
+      .chip.t-l1 {
+        background: var(--st-l1-bg);
+        color: var(--st-l1);
+      }
+      .chip.t-pending {
+        background: var(--surface-2);
+        color: var(--ink-3);
+      }
+      .mech {
+        display: block;
+        font-size: 12px;
+        color: var(--ink-2);
+        margin-top: 3px;
+        max-width: 44ch;
+      }
+      .mech .mins {
+        white-space: nowrap;
+      }
+      .src {
+        font-family: var(--mono);
+        font-size: 10px;
+        color: var(--ink-3);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-left: 6px;
+      }
+      .yes {
+        color: var(--st-l1);
+        font-weight: 600;
+      }
+      .no {
+        color: var(--ink-3);
+      }
+      .pool-mismatch {
+        color: var(--st-slow);
+      }
+      .pool-mismatch::after {
+        content: " \25B3";
+        font-size: 11px;
+      }
+      .pending {
+        color: var(--ink-3);
+      }
+      .err {
+        color: var(--st-error);
+      }
+      td .sub {
+        display: block;
+        font-size: 11px;
+        color: var(--ink-3);
+        font-family: var(--mono);
+      }
+
+      /* Status + notes */
+      .status {
+        margin-top: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 10px;
+        font-size: 12px;
+        color: var(--ink-2);
+      }
+      .status .pill {
+        font-family: var(--mono);
+        font-size: 11px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+        background: var(--surface);
+      }
+      .status .pill.ok {
+        border-color: var(--st-instant);
+        color: var(--st-instant);
+      }
+      .status .pill.bad {
+        border-color: var(--st-error);
+        color: var(--st-error);
+      }
+      .status .pill.wait {
+        color: var(--ink-3);
+      }
+      .notes {
+        margin-top: 26px;
+        color: var(--ink-2);
+        font-size: 13px;
+        max-width: 78ch;
+      }
+      .notes h2 {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--ink-3);
+        margin: 0 0 8px;
+        font-weight: 500;
+      }
+      .notes ul {
+        margin: 0;
+        padding-left: 18px;
+      }
+      .notes li {
+        margin-bottom: 5px;
+      }
+      .notes code {
+        font-family: var(--mono);
+        font-size: 12px;
+        background: var(--surface-2);
+        padding: 0 4px;
+        border-radius: 3px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .btn,
+        .chip {
+          transition: border-color 0.15s, background-color 0.15s;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <div>
+        <h1>Lyra Vault Ledger</h1>
+        <p class="sub">
+          Every superbridge vault backing Derive (chain 957) across the
+          <code>lyra</code> and <code>lyra-old</code> deployments, with how fast
+          each position could reach Ethereum L1.
+        </p>
+      </div>
+      <div class="actions">
+        <span class="stamp" id="stamp">not loaded</span>
+        <button class="btn primary" id="refresh" type="button">Refresh</button>
+      </div>
+    </header>
+
+    <section class="tiles" id="tiles" aria-label="Totals">
+      <div class="tile lead">
+        <div class="label"><span class="sw total"></span>Total locked</div>
+        <div class="value" id="k-total">–</div>
+        <div class="meta" id="k-total-meta">loading…</div>
+      </div>
+      <div class="tile">
+        <div class="label"><span class="sw l1"></span>Already on L1</div>
+        <div class="value" id="k-l1">–</div>
+        <div class="meta" id="k-l1-meta"></div>
+      </div>
+      <div class="tile">
+        <div class="label"><span class="sw instant"></span>Instant to L1</div>
+        <div class="value" id="k-instant">–</div>
+        <div class="meta" id="k-instant-meta"></div>
+      </div>
+      <div class="tile">
+        <div class="label"><span class="sw slow"></span>~7 days to L1</div>
+        <div class="value" id="k-slow">–</div>
+        <div class="meta" id="k-slow-meta"></div>
+      </div>
+      <div class="tile">
+        <div class="label"><span class="sw unknown"></span>Unknown route</div>
+        <div class="value" id="k-unknown">–</div>
+        <div class="meta" id="k-unknown-meta"></div>
+      </div>
+    </section>
+
+    <section class="controls" aria-label="Filters">
+      <label
+        >Deployment
+        <select id="f-dep">
+          <option value="">both</option>
+          <option value="lyra">lyra</option>
+          <option value="lyra-old">lyra-old</option>
+        </select>
+      </label>
+      <label
+        >Chain
+        <select id="f-chain">
+          <option value="">all chains</option>
+        </select></label
+      >
+      <label
+        >Time to L1
+        <select id="f-bucket">
+          <option value="">any</option>
+          <option value="l1">on L1</option>
+          <option value="instant">instant</option>
+          <option value="slow">~7 days</option>
+          <option value="unknown">unknown</option>
+        </select>
+      </label>
+      <label
+        >v3 type
+        <select id="f-v3">
+          <option value="">any</option>
+          <option value="native">native</option>
+          <option value="custom LZ">custom LZ</option>
+        </select>
+      </label>
+      <label
+        ><input type="checkbox" id="f-zero" checked /> hide empty vaults</label
+      >
+      <input
+        type="search"
+        id="f-q"
+        placeholder="search token / address"
+        aria-label="Search"
+      />
+      <span class="count" id="count"></span>
+    </section>
+
+    <div class="tablewrap">
+      <table id="grid">
+        <thead>
+          <tr>
+            <th data-sort="token">Token <span class="dir"></span></th>
+            <th data-sort="chain">Chain <span class="dir"></span></th>
+            <th data-sort="dep">Deployment <span class="dir"></span></th>
+            <th data-sort="v3">v3 type <span class="dir"></span></th>
+            <th data-sort="isL1">Is L1 <span class="dir"></span></th>
+            <th data-sort="minutes">Time to L1 <span class="dir"></span></th>
+            <th class="num" data-sort="amount">
+              Vault balance <span class="dir"></span>
+            </th>
+            <th class="num" data-sort="pool">
+              Derive pool <span class="dir"></span>
+            </th>
+            <th class="num" data-sort="value">
+              Value (USD) <span class="dir"></span>
+            </th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <section class="notes">
+      <h2>How the columns are derived</h2>
+      <ul>
+        <li>
+          <strong>Vault balance</strong> is <code>balanceOf(Vault)</code> on the
+          source chain via Multicall3. <strong>Derive pool</strong> is
+          <code>poolLockedAmounts(connectorPoolIds(connector))</code> on the
+          Derive hook (lyra) or Controller (lyra-old). A
+          <span class="pool-mismatch">triangle</span> marks a gap above 0.5%.
+        </li>
+        <li>
+          <strong>v3 type</strong> is <em>custom LZ</em> for HYPE, kHYPE, FXRP,
+          HEMIBTC, SOL and JITOSOL, otherwise <em>native</em>. SOL and JITOSOL
+          have no vault yet, so they do not appear.
+        </li>
+        <li>
+          <strong>Time to L1</strong> probes the token contract on its chain:
+          LayerZero OFT (<code>oftVersion / token / sharedDecimals</code>), OP
+          Stack bridged token (<code>remoteToken / l1Token + l2Bridge</code>),
+          Arbitrum gateway token (<code>l1Address</code>), custom canonical
+          token (<code>bridge()</code>, e.g. Lido wstETH), Circle CCTP (known
+          USDC addresses), issuer-minted (<code>masterMinter</code>, Coinbase).
+          Tokens with no on-chain marker use a curated table (tagged
+          <span class="src">manual</span>). Custom-LZ tokens are always instant
+          (tagged <span class="src">rule</span>). Anything estimated under 30
+          minutes is <em>instant</em>; canonical rollup withdrawals are ~7 days.
+        </li>
+        <li>
+          <strong>Value</strong> uses DefiLlama current prices for the exact
+          chain and address, falling back to the L1 address of the same symbol.
+        </li>
+        <li>
+          Kelp moved rsETH / wrsETH bridging from LayerZero to Chainlink CCIP
+          after the April 2026 exploit. Both routes are under 30 minutes, so the
+          classification is unchanged.
+        </li>
+      </ul>
+    </section>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+    <script>
+      "use strict";
+
+      /* ------------------------------------------------------------------ config */
+
+      const MULTICALL3 = "0xcA11bde05977b3631167028862bE2a173976CA11";
+      const APP_CHAIN = 957;
+      const INSTANT_MINUTES = 30;
+      const SEVEN_DAYS = 7 * 24 * 60;
+      const MC_CHUNK = 120;
+
+      const CHAINS = {
+        1: {
+          name: "Ethereum",
+          llama: "ethereum",
+          explorer: "https://etherscan.io/address/",
+          rpcs: [
+            "https://eth.drpc.org",
+            "https://ethereum.publicnode.com",
+            "https://eth.merkle.io",
+            "https://cloudflare-eth.com",
+          ],
+        },
+        10: {
+          name: "Optimism",
+          llama: "optimism",
+          explorer: "https://optimistic.etherscan.io/address/",
+          rpcs: [
+            "https://mainnet.optimism.io",
+            "https://optimism-rpc.publicnode.com",
+          ],
+        },
+        14: {
+          name: "Flare",
+          llama: "flare",
+          explorer: "https://flarescan.com/address/",
+          rpcs: [
+            "https://flare-api.flare.network/ext/C/rpc",
+            "https://flare.rpc.thirdweb.com",
+          ],
+        },
+        957: {
+          name: "Derive",
+          llama: null,
+          explorer: "https://explorer.derive.xyz/address/",
+          rpcs: ["https://rpc.derive.xyz"],
+        },
+        999: {
+          name: "HyperEVM",
+          llama: "hyperliquid",
+          explorer: "https://hyperevmscan.io/address/",
+          rpcs: [
+            "https://rpc.hyperliquid.xyz/evm",
+            "https://hyperliquid.drpc.org",
+          ],
+        },
+        8453: {
+          name: "Base",
+          llama: "base",
+          explorer: "https://basescan.org/address/",
+          rpcs: ["https://mainnet.base.org", "https://base-rpc.publicnode.com"],
+        },
+        34443: {
+          name: "Mode",
+          llama: "mode",
+          explorer: "https://explorer.mode.network/address/",
+          rpcs: ["https://mainnet.mode.network"],
+        },
+        42161: {
+          name: "Arbitrum",
+          llama: "arbitrum",
+          explorer: "https://arbiscan.io/address/",
+          rpcs: [
+            "https://arb1.arbitrum.io/rpc",
+            "https://arbitrum-one-rpc.publicnode.com",
+          ],
+        },
+        43111: {
+          name: "Hemi",
+          llama: "hemi",
+          explorer: "https://explorer.hemi.xyz/address/",
+          rpcs: ["https://rpc.hemi.network/rpc"],
+        },
+        81457: {
+          name: "Blast",
+          llama: "blast",
+          explorer: "https://blastscan.io/address/",
+          rpcs: ["https://rpc.blast.io", "https://blast-rpc.publicnode.com"],
+        },
+      };
+
+      // Tokens that will be deployed as "custom LZ" in v3 (always instant to L1).
+      const CUSTOM_LZ = new Set([
+        "HYPE",
+        "KHYPE",
+        "FXRP",
+        "HEMIBTC",
+        "SOL",
+        "JITOSOL",
+      ]);
+
+      // Circle-native USDC (CCTP) per chain.
+      const CCTP_USDC = new Set([
+        "10:0x0b2c639c533813f4aa9d7837caf62653d097ff85",
+        "8453:0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "42161:0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+      ]);
+
+      // Tokens whose contract exposes no bridge marker. Keyed by chainId:address (lowercase).
+      const MANUAL = {
+        // Kelp wrsETH on OP Stack chains: minted by Kelp's bridge (LayerZero until Apr 2026, CCIP since).
+        "10:0x87eee96d50fb761ad85b1c982d28a042169d61b1": {
+          mech: "Kelp bridge (Chainlink CCIP, ex-LayerZero)",
+          minutes: 20,
+        },
+        "8453:0xedfa23602d0ec14714057867a78d01e94176bea0": {
+          mech: "Kelp bridge (Chainlink CCIP, ex-LayerZero)",
+          minutes: 20,
+        },
+        "34443:0xe7903b1f75c534dd8159b313d92cdcfbc62cb3cd": {
+          mech: "Kelp bridge (Chainlink CCIP, ex-LayerZero)",
+          minutes: 20,
+        },
+        "81457:0xe7903b1f75c534dd8159b313d92cdcfbc62cb3cd": {
+          mech: "Kelp bridge (Chainlink CCIP, ex-LayerZero)",
+          minutes: 20,
+        },
+        // USDT on Arbitrum is USD₮0: LayerZero OFT via a separate OFT contract.
+        "42161:0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9": {
+          mech: "LayerZero OFT (USDT0)",
+          minutes: 5,
+        },
+        // Maker's own DAI gateways sit on the canonical rollup messaging.
+        "10:0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": {
+          mech: "Maker DAI gateway over OP canonical bridge",
+          minutes: SEVEN_DAYS,
+        },
+        "42161:0xda10009cbd5d07dd0cecc66161fc93d7c9000da1": {
+          mech: "Maker DAI gateway over Arbitrum canonical bridge",
+          minutes: SEVEN_DAYS,
+        },
+        // L2-native tokens that leave via the standard bridge.
+        "10:0x4200000000000000000000000000000000000042": {
+          mech: "OP Standard Bridge (L2-native OP)",
+          minutes: SEVEN_DAYS,
+        },
+        "10:0x4200000000000000000000000000000000000006": {
+          mech: "Unwrap + OP Standard Bridge (ETH)",
+          minutes: SEVEN_DAYS,
+        },
+        "8453:0x4200000000000000000000000000000000000006": {
+          mech: "Unwrap + Base Standard Bridge (ETH)",
+          minutes: SEVEN_DAYS,
+        },
+        "10:0x8700daec35af8ff88c16bdf0418774cb3d7599b4": {
+          mech: "Synthetix bridge over OP canonical messaging",
+          minutes: SEVEN_DAYS,
+        },
+        // Issuer bridges built on Chainlink CCIP.
+        "8453:0xecac9c5f704e954931349da37f60e39f515c11c1": {
+          mech: "Lombard bridge (Chainlink CCIP)",
+          minutes: 15,
+        },
+        "8453:0x3b86ad95859b6ab773f55f8d94b4b9d443ee931f": {
+          mech: "Solv cross-chain (Chainlink CCIP)",
+          minutes: 20,
+        },
+        "8453:0xc26c9099bd3789107888c35bb41178079b282561": {
+          mech: "Solv cross-chain (Chainlink CCIP)",
+          minutes: 20,
+        },
+        "42161:0x3647c54c4c2c65bc7a2d63c0da2809b399dbbdc0": {
+          mech: "Solv cross-chain (Chainlink CCIP)",
+          minutes: 20,
+        },
+        "42161:0x346c574c56e1a4aaa8dc88cda8f7eb12b39947ab": {
+          mech: "Solv cross-chain (Chainlink CCIP)",
+          minutes: 20,
+        },
+      };
+
+      // Extra context shown under the mechanism for detected routes.
+      const NOTES = {
+        "42161:0x4186bfc76e2e237523cbc30fd220fe055156b41f":
+          "Kelp now routes via CCIP; OFT path may be paused",
+      };
+
+      /* ---------------------------------------------------------- deployments */
+
+      // Snapshot of deployments/superbridge/prod_lyra*_addresses.json. Used when the
+      // live JSON cannot be fetched (file:// opens). Regenerate with the header command.
+      const EMBEDDED_DEPLOYMENTS = /*@@DEPLOYMENTS_START@@*/ {
+        lyra: {
+          1: {
+            weETH: {
+              isAppChain: false,
+              NonMintableToken: "0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee",
+              Vault: "0x8180EcCC825b692ef65FF099a0A387743788bf78",
+              LyraTSAShareHandlerDepositHook:
+                "0x204cDCFE0D03c75a41A0079f187a7870265Bc949",
+              connectors: {
+                957: { FAST: "0xCc958F84DaF36d3eC20BcBee7E99C073B882efc3" },
+              },
+            },
+            rswETH: {
+              isAppChain: false,
+              NonMintableToken: "0xFAe103DC9cf190eD75350761e95403b7b8aFa6c0",
+              Vault: "0x4BB4C3CDc7562f08e9910A0C7D8bB7e108861eB4",
+              LyraTSAShareHandlerDepositHook:
+                "0xAf65752C4643E25C02F693f9D4FE19cF23a095E3",
+              connectors: {
+                957: { FAST: "0xF15d420bE7b27F1fA0D9487105658EdC3C0EA508" },
+              },
+            },
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0xA1290d69c65A6Fe4DF752f95823fae25cB99e5A7",
+              Vault: "0x35d4D9bc79B0a543934b1769304B90d752691caD",
+              LyraTSAShareHandlerDepositHook:
+                "0x6FEf1bb8Ade9A836663d4c15AFd5985Fb545004f",
+              connectors: {
+                957: { FAST: "0x388341d9E5A7D7d5accD738B2a31b0622E0c1b87" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+              Vault: "0xE3E96892D30E0ee1a8131BAf87c891201F7137bf",
+              LyraTSADepositHook: "0xAF3f1CDd6Fcf67D22dA8C8D4871bafc518b3eD5d",
+              connectors: {
+                957: { FAST: "0xfa8c07E28461eb7c65b33De024DB97eE4C052C97" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+            DAI: {
+              isAppChain: false,
+              NonMintableToken: "0x6b175474e89094c44da98b954eedeac495271d0f",
+              Vault: "0x7E1d17b580dD4F89037DB331430eAEe8B8e50c91",
+              LyraTSAShareHandlerDepositHook:
+                "0x69812bDf2b6466E8e40A9790105e547d9Aed77B7",
+              connectors: {
+                957: { FAST: "0xa1D11b141bb47eDb2c69B8ced4EFe80f62D1C276" },
+              },
+            },
+            sDAI: {
+              isAppChain: false,
+              NonMintableToken: "0x83F20F44975D03b1b09e64809B757c47f942BEeA",
+              Vault: "0x613e87BE1cd75dEBC5e6e56a2AF2fED84162C142",
+              LyraTSAShareHandlerDepositHook:
+                "0xe3500cca2F08049fd3436908bfC03f68018acC6e",
+              connectors: {
+                957: { FAST: "0x083Add2A9afa97Efb6412b293145ce965eCE3600" },
+              },
+            },
+            USDe: {
+              isAppChain: false,
+              NonMintableToken: "0x4c9edd5852cd905f086c759e8383e09bff1e68b3",
+              Vault: "0x26Cf1Dc84694E04277F2Fe4C13E43597c6010C2A",
+              LyraTSAShareHandlerDepositHook:
+                "0xf962a0ec49E83dD97454200D88ee04Ad86393636",
+              connectors: {
+                957: { FAST: "0x254691C06Da387c1050C726cF498eFdA89083820" },
+              },
+            },
+            PYUSD: {
+              isAppChain: false,
+              NonMintableToken: "0x6c3ea9036406852006290770bedfcaba0e23a0e8",
+              Vault: "0x30147A4989a0282aab8C9477aE9341dA4D09d3B1",
+              LyraTSAShareHandlerDepositHook:
+                "0x6383aEbEe6EE46Bc4d577B9803ab5C5402991a0f",
+              connectors: {
+                957: { FAST: "0x37C24e7081eb7f2B16bde81b556d082c0839F754" },
+              },
+            },
+            LBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x8236a87084f8B84306f72007F36F2618A5634494",
+              Vault: "0x76624ff43D610F64177Bb9c194A2503642e9B803",
+              LyraTSAShareHandlerDepositHook:
+                "0x5Fc48A32437Ff4BBab2A22646c3c9344ba003971",
+              connectors: {
+                957: { FAST: "0x457379de638CAFeB1759a22457fe893b288E2e89" },
+              },
+            },
+            cbBTC: {
+              isAppChain: false,
+              NonMintableToken: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+              Vault: "0x5F18C54e4E10287414A47925a24Ea3A8Cf4A9F50",
+              LyraTSAShareHandlerDepositHook:
+                "0x1EA87f372285409425771F19Eb7938b427DAb148",
+              connectors: {
+                957: { FAST: "0xBc978f47AD1122bdFE85855fcc40b3afdF4b5df3" },
+              },
+            },
+            eBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x657e8C867D8B37dCC18fA4Caead9C45EB088C642",
+              Vault: "0x25d35C8796c9dcD3857abE90D802FC17b1FB55A5",
+              LyraTSAShareHandlerDepositHook:
+                "0xC4230381a4967975Fb52CdF8f87C1658A85f16f4",
+              connectors: {
+                957: { FAST: "0x094570E556C8E58119E21f47759F02F50Ae3bB49" },
+              },
+            },
+            SolvBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x7a56e1c57c7475ccf742a1832b028f0456652f97",
+              Vault: "0x383a4EdB30E896b8d2d044Be87079D45c0EA7065",
+              LyraTSAShareHandlerDepositHook:
+                "0x0fC32B6ce15c18Bf201Deb79f5dAD22d5625a0de",
+              connectors: {
+                957: { FAST: "0x94104d7801f30d2f9069118C65Fe63A3A11515B1" },
+              },
+            },
+            SolvBTCBBN: {
+              isAppChain: false,
+              NonMintableToken: "0xd9D920AA40f578ab794426F5C90F6C731D159DEf",
+              Vault: "0xB592512153c22F5Ba573b0c3E04cAB99d4Cd8856",
+              LyraTSAShareHandlerDepositHook:
+                "0xfF8d2EBA025E3bC035bF13f4f73BeFaA7517EFC2",
+              connectors: {
+                957: { FAST: "0xA2bE759B86CeA53372C3e9a882047cdC3884D568" },
+              },
+            },
+            deUSD: {
+              isAppChain: false,
+              NonMintableToken: "0x15700b564ca08d9439c58ca5053166e8317aa138",
+              Vault: "0x5bF824C739B7d102D489c7A64Ec1dbDF7A667a61",
+              LyraTSAShareHandlerDepositHook:
+                "0xb8eC7088f1E099b02a2eF9E3dE42DA8fE4b00f31",
+              connectors: {
+                957: { FAST: "0x15f70f64438603e5872A4E81c7a8B5edB5D70d93" },
+              },
+            },
+            OLAS: {
+              isAppChain: false,
+              NonMintableToken: "0x0001a500a6b18995b03f44bb040a5ffc28e45cb0",
+              Vault: "0x412Ac6044401cDf1e9833B7056c14C74AA593D37",
+              LyraTSAShareHandlerDepositHook:
+                "0xD9C7e18E08dd839Ec975061f498d602112fcA13c",
+              connectors: {
+                957: { FAST: "0xB1dfE248EEfa405654b9ff7D470403452180b862" },
+              },
+            },
+            AAVE: {
+              isAppChain: false,
+              NonMintableToken: "0x7fc66500c84a76ad7e9c93437bfc5ac33e2ddae9",
+              Vault: "0x4421461239aE746127C13a19177656124433dC60",
+              LyraTSAShareHandlerDepositHook:
+                "0x56B7597e08E6636D8f41B0aC1a7c475b89a7aA84",
+              connectors: {
+                957: { FAST: "0x3645C506F4E22eA2380B8c4fd5fA914F36dfc3b0" },
+              },
+            },
+            MUSD: {
+              isAppChain: false,
+              NonMintableToken: "0xdd468a1ddc392dcdbef6db6e34e89aa338f9f186",
+              Vault: "0xdF9aCfd417584B25Cde387972D28dbb7F33C1a72",
+              LyraTSAShareHandlerDepositHook:
+                "0xFCb49F4d618571E4F537Deeb4e72bD81A9457DB9",
+              connectors: {
+                957: { FAST: "0x5Ed056B2AA13E19c5CCd4624F3e93C1B621faD5A" },
+              },
+            },
+            PUFETH: {
+              isAppChain: false,
+              NonMintableToken: "0xd9a442856c234a39a81a089c06451ebaa4306a72",
+              Vault: "0xfeF430377E7ed9bF5E4cadC41C709BF4BB6235fE",
+              LyraTSAShareHandlerDepositHook:
+                "0xDFc777078b55211dbf1d3F5776F1Fe21aeF3F4bf",
+              connectors: {
+                957: { FAST: "0x82D4A4f701A5781AE6236FFA25545329a6161b76" },
+              },
+            },
+            XAUT: {
+              isAppChain: false,
+              NonMintableToken: "0x68749665ff8d2d112fa859aa293f07a622782f38",
+              Vault: "0xd7D75Fb3e4df1C148241Dc38D9E842100A8837a3",
+              LyraTSAShareHandlerDepositHook:
+                "0xCB39cD7831F091beCa153c08453066D7913b598B",
+              connectors: {
+                957: { FAST: "0x22Be0dBe1fe7536613F0AD717D7B8E3fAeAa43fD" },
+              },
+            },
+            AUSD: {
+              isAppChain: false,
+              NonMintableToken: "0x00000000efe302beaa2b3e6e1b18d08d69a9012a",
+              Vault: "0x11Af9B83667A9E23b3A1ADD7b234304Fa13C128A",
+              LyraTSAShareHandlerDepositHook:
+                "0x4336eC96946d8F65F657DA093e6089b72669C33c",
+              connectors: {
+                957: { FAST: "0xDDAf82385cf023bd5Bc7C5700a922f0EB50AF4F6" },
+              },
+            },
+          },
+          10: {
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0x87eEE96D50Fb761AD85B1c982d28A042169d61b1",
+              Vault: "0x44ed9cE901B367B1EF9DDBD4974C82A514c50DEc",
+              LyraTSAShareHandlerDepositHook:
+                "0x8F8c29B0271D4c60435DaF148df4a84edcB21c98",
+              connectors: {
+                957: { FAST: "0x497C4eFeeE525f6a76AC77584F7Ec2FA06504984" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2",
+              Vault: "0x5324c6d731a3d9D740e880929E2c952bA27408De",
+              LyraTSADepositHook: "0xA79399cD8f80453b5c07349Fa7807dc8Fc48BfEA",
+              connectors: {
+                957: { FAST: "0x4BB4C3CDc7562f08e9910A0C7D8bB7e108861eB4" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+            DAI: {
+              isAppChain: false,
+              NonMintableToken: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+              Vault: "0x43b019139946466A010c936a85df14C17C4159c0",
+              LyraTSAShareHandlerDepositHook:
+                "0x63806523A9c8B07cEeDB2329771A180D8C902296",
+              connectors: {
+                957: { FAST: "0x2D2a7d1E64BDE29AcD7480392Cf9a70B06E31958" },
+              },
+            },
+            sDAI: {
+              isAppChain: false,
+              NonMintableToken: "0x2218a117083f5b482b0bb821d27056ba9c04b1d3",
+              Vault: "0x0464B37C067a60d391403d4bD1197870fB6aF2D0",
+              LyraTSAShareHandlerDepositHook:
+                "0x41C7f0B8c59F066517C63CB4bDf87B7DF1ade8a6",
+              connectors: {
+                957: { FAST: "0x6119190Ba4ee319820ec166d30412CA7Be54A3ed" },
+              },
+            },
+            USDe: {
+              isAppChain: false,
+              NonMintableToken: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+              Vault: "0x76E57c252A86e7a9C7E06D2e0c427f878805eaB2",
+              LyraTSAShareHandlerDepositHook:
+                "0xeB184dcae58290F5f3c5Ca1A32813ebd28b6079f",
+              connectors: {
+                957: { FAST: "0xFd578bF719f150d90Cf606b1936cA8C7AE8C1815" },
+              },
+            },
+            OP: {
+              isAppChain: false,
+              NonMintableToken: "0x4200000000000000000000000000000000000042",
+              Vault: "0xf912e4a4157B535940f346d35e319554B5625578",
+              LyraTSAShareHandlerDepositHook:
+                "0x22B4EE18073a189d5d02fA1ffF3147AeDD7b07ca",
+              connectors: {
+                957: { FAST: "0xF90b959ae8dfBa2DD793AD05176209835658362b" },
+              },
+            },
+            OLAS: {
+              isAppChain: false,
+              NonMintableToken: "0xfc2e6e6bcbd49ccf3a5f029c79984372dcbfe527",
+              Vault: "0x23F2E0C64aE525948A8b13935d8c180D8590764b",
+              LyraTSAShareHandlerDepositHook:
+                "0x10Aa306840b822B8Bd6C025226C2956a9B0d5588",
+              connectors: {
+                957: { FAST: "0x60afaEEb4Baa7fa1E9dE7A7e99A971fED763ab9c" },
+              },
+            },
+            AAVE: {
+              isAppChain: false,
+              NonMintableToken: "0x76fb31fb4af56892a25e32cfc43de717950c9278",
+              Vault: "0x8e875Cc9022666011D07239fC06DB95E7068FCd2",
+              LyraTSAShareHandlerDepositHook:
+                "0xbE5fb0b26C2dBD7e9809Cd013FdFB421f3fcc18F",
+              connectors: {
+                957: { FAST: "0x1d080C689B930f9dEa69CB3B4Bc6b8c213DFC2ad" },
+              },
+            },
+          },
+          14: {
+            FXRP: {
+              isAppChain: false,
+              NonMintableToken: "0xad552a648c74d49e10027ab8a618a3ad4901c5be",
+              Vault: "0x8574CBC539c26Df9ec11bA283218268101ff10e1",
+              LyraTSAShareHandlerDepositHook:
+                "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+              connectors: {
+                957: { FAST: "0xE7603DF191D699d8BD9891b821347dbAb889E5a5" },
+              },
+            },
+          },
+          957: {
+            weETH: {
+              isAppChain: true,
+              MintableToken: "0x7B35b4c05a90Ea5f311AeC815BE4148b446a68a2",
+              Controller: "0xf58fF1Adc4d045e712a6D91e69d93B4092516659",
+              connectors: {
+                1: { FAST: "0x1a22ec8Af98c39075afDf671a1e52bb569F74215" },
+                8453: { FAST: "0xF6c475d2aB23d84e45AD3634C8956dCDe27315E0" },
+                34443: { FAST: "0x587A4339c8964Bb89E5b5a6D12ED66332F45b643" },
+                42161: { FAST: "0x6Ee9b6ad1c97AdeeD071fd5f349cE65f91e43333" },
+                81457: { FAST: "0x24d3Fa7F0970E3818F232189b374E6C0325b45b8" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x3DA9fd8FBf8Bee51C580985BC48a0a3128adEBF8",
+            },
+            rswETH: {
+              isAppChain: true,
+              MintableToken: "0xC419959850d49166C2d5250Ee89ff9910679D8c8",
+              Controller: "0x6Fde8a8194B6CF67ff33356448d06bD8f90C1eF1",
+              LyraTSADepositHook: "0x54ba56A7cf7bD0c19a9Aa26157721A0fcE9c00C6",
+              connectors: {
+                1: { FAST: "0x7447bbF1F7A8101fEC9c0DA5487dB607657A88A1" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0xe7aD0135f898dCbF4C2CEe7367d918fD62982ecc",
+            },
+            rsETH: {
+              isAppChain: true,
+              MintableToken: "0xc47e2E800a9184cFbD274AC1eeCcCDF942715dB7",
+              Controller: "0x6DCA2Cb269b7618B1F0D6195B5f0eAF3641b7136",
+              LyraTSADepositHook: "0xC265FCD2499f1cbEd86B8a28E9819e2569A2C9C7",
+              connectors: {
+                1: { FAST: "0x4984D046EF87F9bCA7AE86558C567b898C4f6acD" },
+                10: { FAST: "0x16753c0227db5a3d346Ef14B9F9CB52089f83e0C" },
+                8453: { FAST: "0xD76d36056F4c2Bae3dE175E11163653b23CF51d3" },
+                34443: { FAST: "0x7bf0fD2d7bC9ea7a1Be8bF3E4F9213Bcce9257bb" },
+                42161: { FAST: "0x851e30395dcb2c8438cC245d7e28da7c7E23F870" },
+                81457: { FAST: "0x442F65Aad998d8aD238Ea99dCd6A367F26a0Cb70" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x4b71552b8A5E0F681FD6b468023279902f98956E",
+            },
+            sUSDe: {
+              isAppChain: true,
+              MintableToken: "0xb82d12742c3728a14eaa43ebe1c0d32bb62216eb",
+              Controller: "0x12A3674207E345c79e1AD67F62e3988e6bb06287",
+              LyraTSADepositHook: "0x5b1E1FA4e4BeBfcD9aC3e19fF16fEe65A2660fee",
+              connectors: {
+                1: { FAST: "0x687E1c385740841a1a30eA53bF272664EDC57D9b" },
+                10: { FAST: "0x941ce45a3ec4EC6c0d14AFa726af6c788fC5A717" },
+                8453: { FAST: "0x7AF8EFDDCa5C70c49808615837478Ed6C94C9dc8" },
+                34443: { FAST: "0x64ae91D75630De44Bb283abf2A74dCE471FF02C4" },
+                42161: { FAST: "0x82d599C4982301d3Ce26b2AdcB67602DFa0b9f23" },
+                81457: { FAST: "0xc162b9D815f2E81962D4014e4535b55af4085eA5" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0xF7C3e76Ec6E7Dd24EE8Ad5d72155BA94573c51B6",
+            },
+            DAI: {
+              isAppChain: true,
+              MintableToken: "0xB56D58Ce246C31c4D3a3bFB354996FF28D081dB7",
+              Controller: "0x335022f0172eD2B12F6b9791Ebc3804956A4E7F2",
+              LyraTSAShareHandlerDepositHook:
+                "0x85F872FdD53cc2eFe3E7a5C895d32B6a7446025c",
+              connectors: {
+                1: { FAST: "0x3f6305Be91a9616642be430d15C7C7803610A045" },
+                10: { FAST: "0xA2197e483D54Eed928a31474Fdd2e634Cc6865E9" },
+                8453: { FAST: "0xDac1CB684b414C637D50D769d8056a4543E8f7a8" },
+                42161: { FAST: "0xe14CB5cb161B24De6575312B393C76404dD2be4D" },
+              },
+            },
+            sDAI: {
+              isAppChain: true,
+              MintableToken: "0x7215a841215cfCcAC7F0894f5F194e8fAa6E5844",
+              Controller: "0xc6aB61e3C82669cc105B9f9D025871F79D1DaFfe",
+              LyraTSAShareHandlerDepositHook:
+                "0x3eD1799805a126633ae150e6b722aff8cDD72440",
+              connectors: {
+                1: { FAST: "0xe713031fEcaCC712860a82953f40Be7CA2F4Ac05" },
+                10: { FAST: "0x4F80E85caA0d1dFd6530814Bc8baFC47Da2cf532" },
+                8453: { FAST: "0x705Eb3D0c70E2f5fce5b5CD0Cf1BECF7c6b37E0F" },
+              },
+            },
+            USDe: {
+              isAppChain: true,
+              MintableToken: "0x1569e57B9e1dA866f9b862Acd8b134ea16B234F5",
+              Controller: "0x11f50642f845308C73ce6FE7df06FE52120345Bb",
+              LyraTSAShareHandlerDepositHook:
+                "0xF87b17c5653bFbadcC297d8191990f3CFF08Ac87",
+              connectors: {
+                1: { FAST: "0xA5019Aa47E038611a60F5D27cD2052c620B11B51" },
+                10: { FAST: "0x614636E7479f2E0ECBf752Eec894f1C748969d97" },
+                8453: { FAST: "0xA56Af54A036DA458DA5989a7AB208b964E8707a9" },
+                42161: { FAST: "0x1AeA2f2Cae34428baDabC4312eb32C89b2c279a5" },
+              },
+            },
+            PYUSD: {
+              isAppChain: true,
+              MintableToken: "0x1984Bb061B9301e7ccD6E1731AFb70dfA2b0418D",
+              Controller: "0x60303faaB9e142Ec16c977ab9C83eF2596839f12",
+              LyraTSAShareHandlerDepositHook:
+                "0x3D734ebcb757fF9261C5C4729D9c765196eb17C4",
+              connectors: {
+                1: { FAST: "0x3a0701442ef546937d0cd5b4414710119e4fC339" },
+              },
+            },
+            LBTC: {
+              isAppChain: true,
+              MintableToken: "0x36b5C126A3D7B25F6032653A0d18823Ee48a890e",
+              Controller: "0x5eFC527B2640681289E31E1e29f94EA397b6c589",
+              LyraTSAShareHandlerDepositHook:
+                "0x367711f0377867b51Fe53e30F5125a9A31d3D50b",
+              connectors: {
+                1: { FAST: "0x52CB41109b637F03B81b3FD6Dce4E3948b2F0923" },
+                8453: { FAST: "0xAB6ed8b53A2FECfA11968BcDC334B7696eE98477" },
+              },
+            },
+            cbBTC: {
+              isAppChain: true,
+              MintableToken: "0x1EA87f372285409425771F19Eb7938b427DAb148",
+              Controller: "0x002d349bd4526F8cfaEe4283990710E4E1a57a3d",
+              LyraTSAShareHandlerDepositHook:
+                "0x16Cd3746EEf978e368781f0281437D6C53807211",
+              connectors: {
+                1: { FAST: "0xdB2F60c2672116a9572cF6750B1e519e7036BF16" },
+                8453: { FAST: "0x731952E0762ED67730F6E38db69b1f5C4cE7EbaD" },
+              },
+            },
+            eBTC: {
+              isAppChain: true,
+              MintableToken: "0x4d4e6761D2D8d5AdCa3646987970D63C00704eb5",
+              Controller: "0xdA7e1F0CED4e68feB63E7b4f1eaE0b8aCD2BF092",
+              LyraTSAShareHandlerDepositHook:
+                "0x56BC3b30cDE7DA5ca3Ac5A8f83d77fee5744C11a",
+              connectors: {
+                1: { FAST: "0xe7C9AD506Bab95d6963eD2DB1cfa6C41BfdE130b" },
+              },
+            },
+            OP: {
+              isAppChain: true,
+              MintableToken: "0x30f85847F9F17f219A9a21B93396a3B2eAEa500F",
+              Controller: "0x63Ad20fBC3506e9847445F3212b251062b0Bb454",
+              LyraTSAShareHandlerDepositHook:
+                "0xd8Ba84e136b7F29F3563625f38517C94fbd698bA",
+              connectors: {
+                10: { FAST: "0xB320207976fa449dE5c7e4A710cC23DB7FdD05E9" },
+              },
+            },
+            SolvBTC: {
+              isAppChain: true,
+              MintableToken: "0xCFB66706ae87F60120aF42F07eC8940bE44a34d6",
+              Controller: "0x566FeFc36d78a8158d8afE7eD1E3557F1B2596B5",
+              LyraTSAShareHandlerDepositHook:
+                "0x976f34A63476dd70ccCA8A4e6A25C277Be369da4",
+              connectors: {
+                1: { FAST: "0x8A2e26918D89e41A36Cc331AaF4b9e76ce6bEb86" },
+                8453: { FAST: "0x6cb9adEE2e2457f534e0815933bb51C6bdf555c7" },
+                42161: { FAST: "0x3944E021388B6ADD7f5db5E4fDFf0E6739F7a81e" },
+              },
+            },
+            SolvBTCBBN: {
+              isAppChain: true,
+              MintableToken: "0x7755C4529017CA8069f57B19E450FFaf128048A6",
+              Controller: "0xC5225837E112341A0880391793CBCC41dc9139e6",
+              LyraTSAShareHandlerDepositHook:
+                "0xb37Bb71C28E6518203BE466Ea6BAEF65D2f4F43D",
+              connectors: {
+                1: { FAST: "0x1C411FB64A40898a9CAED611dE479810FC8557B5" },
+                8453: { FAST: "0x25b89a51bD72266e00D7ae65F7e8CBd6F4d250B9" },
+                42161: { FAST: "0x20223F941d54c86daF56792728FcAB69bc3f8b78" },
+              },
+            },
+            deUSD: {
+              isAppChain: true,
+              MintableToken: "0x5BD7627bf9cf44399A46668B2365579832090f20",
+              Controller: "0x0C3f440E1e62fE57258132c95c936CB8B78AF924",
+              LyraTSAShareHandlerDepositHook:
+                "0x91e97A31963285A2CAFC62F38652e87D180A110c",
+              connectors: {
+                1: { FAST: "0xeE5dB4263669d496718e7Fc4351ac5C677e2E097" },
+              },
+            },
+            OLAS: {
+              isAppChain: true,
+              MintableToken: "0xCd6A5DCB5a9b5E4801AC50F3E9171a80017D1EC2",
+              Controller: "0x46bDD946038E353Be612BaE39e1db5b20f569622",
+              LyraTSAShareHandlerDepositHook:
+                "0xA545375cDddB276F3AAE822d5984204F5f0CC1D0",
+              connectors: {
+                1: { FAST: "0x6C22D4eC3Ee3D2efA5Cc4c0A089Bc200de90102e" },
+                10: { FAST: "0xd59479dD55Aa3E7c20D602E05240F5690e23d1BD" },
+                8453: { FAST: "0x985aDb534487D40d9845d23CE7a00CD5Eb844F8B" },
+                42161: { FAST: "0x437f1e39Fd059db8A5B4ACc54DF8B71B2C874681" },
+              },
+            },
+            AAVE: {
+              isAppChain: true,
+              MintableToken: "0x4B6D888E801e57Cb545e0d2ee261d03537992b19",
+              Controller: "0xD524e5BB44788b1666f97f2dBF711cC6218547Cb",
+              LyraTSAShareHandlerDepositHook:
+                "0x97B2c82a8AA97D89E1a8ed00B9F7B7ceA330423D",
+              connectors: {
+                1: { FAST: "0xBb421D28A5D13ee901D77D9E03ADe0f92E79C94E" },
+                10: { FAST: "0xD7605f0406CBE15F159a4C0a8c0c2aD2A9b8956E" },
+                8453: { FAST: "0x8Cff4C70dF451Fb40d020f7AfE97221d3D184A15" },
+                42161: { FAST: "0x7B46C3933Bb59B305c30fD100Ed53f9C8Fa91003" },
+              },
+            },
+            MUSD: {
+              isAppChain: true,
+              MintableToken: "0xa30aB68436d26b3c6c303B777354105055Fc3A30",
+              Controller: "0xC6C3aD50f8D47527D4f239b0392206e3e5eBEB18",
+              LyraTSAShareHandlerDepositHook:
+                "0x658630e3F7D32e93400b65882Ed4AE96A46B9e68",
+              connectors: {
+                1: { FAST: "0xbDc0AE4974A75336726160895DF58b01cb9d45E3" },
+              },
+            },
+            HYPE: {
+              isAppChain: true,
+              MintableToken: "0x1AeC0cE2f05b958369bFF35290ED0e03E776b9F4",
+              Controller: "0x9a65e766FB1DBa12b20787f45eB730CE1d055b7D",
+              LyraTSAShareHandlerDepositHook:
+                "0x84FB54859e8CA2E6E29f4A2D823e5463f35D9f80",
+              connectors: {
+                999: { FAST: "0xe8a708d94ceCCa38DB0286713bD7Cb42a451e8cA" },
+              },
+            },
+            PUFETH: {
+              isAppChain: true,
+              MintableToken: "0x95d0e6282CE9A29f3051837b38ba76E1CF8227F0",
+              Controller: "0x48A64190678c75C49b6236f2DB7AB9714e9B9674",
+              LyraTSAShareHandlerDepositHook:
+                "0x702bddB7ce5773aAE7fCc08c2986db552083d259",
+              connectors: {
+                1: { FAST: "0xD2879CB27503E34cEE270d6C8E0D2DA7CCA6dEa1" },
+              },
+            },
+            KHYPE: {
+              isAppChain: true,
+              MintableToken: "0x208d27a880A2cBD33386C358792AE1b292dcB6E1",
+              Controller: "0x0dbD620a144D6e6BF4c6BF5a9643D7CB95589792",
+              LyraTSAShareHandlerDepositHook:
+                "0xdbe8B35bbe0cBD9fbfDA7668E0989057C49f95df",
+              connectors: {
+                999: { FAST: "0x3Ce7166eF88De94865AfD1225F711bF8364A2987" },
+              },
+            },
+            USDH: {
+              isAppChain: true,
+              MintableToken: "0xe3a2A1F02Bc20967Af7AeCF2d7e5474cec8542c4",
+              Controller: "0xE195e1FbD075559c8F7D2FbD0a0BF7ca6dE1b2fB",
+              LyraTSAShareHandlerDepositHook:
+                "0xD6925c86E56345fA1640aCf9104801975BfFc683",
+              connectors: {
+                999: { FAST: "0x671260304A7a0A95A1CC322689A5D88681a272EF" },
+              },
+            },
+            cbADA: {
+              isAppChain: true,
+              MintableToken: "0x182862162d9281247ED3E697d4DFfa515C82DD8D",
+              Controller: "0x60a3b0827Cf3e131Fe91c83b2D6312D0205dd8eA",
+              LyraTSAShareHandlerDepositHook:
+                "0xDBEC57103dA7cfA0483E4203245233dc3033a572",
+              connectors: {
+                8453: { FAST: "0x680E6F5Bc77b4ff8CAd295f3C83723BFAf179fC1" },
+              },
+            },
+            XAUT: {
+              isAppChain: true,
+              MintableToken: "0x83b4a2A6F254fa33Ae3F25054a53a5E77b93b2dA",
+              Controller: "0x2F2d096955ea6fDe9870EF040D2E51924B7dF21C",
+              LyraTSAShareHandlerDepositHook:
+                "0x5035E7076e0Dad7b8CdEd0CCB60b16b389999686",
+              connectors: {
+                1: { FAST: "0x4Cc34E24eDD6E2D65d7Dcb1edE3bCD19badc6462" },
+              },
+            },
+            FXRP: {
+              isAppChain: true,
+              MintableToken: "0xf88f38e0b96894eCa6aC1017038505dc6abD5073",
+              Controller: "0xA75E8cEd59E569C9980d3724c09250cCbC5A1563",
+              LyraTSAShareHandlerDepositHook:
+                "0x33BCe9787Cd38D47678675299F5351E86a5cEF0A",
+              connectors: {
+                14: { FAST: "0x95947f904Af89624Dbada6acBcf14376EA338Aa0" },
+              },
+            },
+            HEMIBTC: {
+              isAppChain: true,
+              MintableToken: "0x30cCDB5d54a2FdBf367e49c537a6d6A5290818C1",
+              Controller: "0x147871Da07EF7df373aBE2c0e09821e1BF4182c1",
+              LyraTSAShareHandlerDepositHook:
+                "0xF0a62a2469395dC74a08Dc2E5cE862673890fe0E",
+              connectors: {
+                43111: { FAST: "0x8E0E0c648a8Bd6c453530581B6240e923FD69398" },
+              },
+            },
+            AUSD: {
+              isAppChain: true,
+              MintableToken: "0x806a6caccafc01f4CEb6825703C8210ce7E34999",
+              Controller: "0x8665d04F59e0F23E4A8Bf34c117DcBb87Ff50f6c",
+              LyraTSAShareHandlerDepositHook:
+                "0x6957A0964F29A8BF7E5cFd9553d37dc216b0315C",
+              connectors: {
+                1: { FAST: "0x1Eb34cFe31B2320465a5A60D719D4e4d5F2eCD4f" },
+              },
+            },
+          },
+          999: {
+            HYPE: {
+              isAppChain: false,
+              NonMintableToken: "0x5555555555555555555555555555555555555555",
+              Vault: "0x2B4FaCC4B6bDc42074B3EFF9aB5943c8855A7860",
+              LyraTSAShareHandlerDepositHook:
+                "0xF982c812099d03AFFa0c8062aa1abcb584c23329",
+              connectors: {
+                957: { FAST: "0x44ed9cE901B367B1EF9DDBD4974C82A514c50DEc" },
+              },
+            },
+            KHYPE: {
+              isAppChain: false,
+              NonMintableToken: "0xfd739d4e423301ce9385c1fb8850539d657c296d",
+              Vault: "0xd464170afe0eE2a4865B2ca6dBcc6dfB8f4Bf125",
+              LyraTSAShareHandlerDepositHook:
+                "0xbfe7Cd69d3983299D3d18D1Ae5C411e1FF61A993",
+              connectors: {
+                957: { FAST: "0x30A6E6A3851c18aa67429ACC8a1DfAFE20A29FEb" },
+              },
+            },
+            USDH: {
+              isAppChain: false,
+              NonMintableToken: "0x111111a1a0667d36bd57c0a9f569b98057111111",
+              Vault: "0x204cDCFE0D03c75a41A0079f187a7870265Bc949",
+              LyraTSAShareHandlerDepositHook:
+                "0xCc958F84DaF36d3eC20BcBee7E99C073B882efc3",
+              connectors: {
+                957: { FAST: "0x3E4296a8bD6837b33284348cC32B588c0F9b1255" },
+              },
+            },
+          },
+          8453: {
+            weETH: {
+              isAppChain: false,
+              NonMintableToken: "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+              Vault: "0xF982c812099d03AFFa0c8062aa1abcb584c23329",
+              LyraTSAShareHandlerDepositHook:
+                "0x44ed9cE901B367B1EF9DDBD4974C82A514c50DEc",
+              connectors: {
+                957: { FAST: "0x8F8c29B0271D4c60435DaF148df4a84edcB21c98" },
+              },
+            },
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0xEDfa23602D0EC14714057867A78d01e94176BEA0",
+              Vault: "0xC4Cb2F82A01dC896a4d423231E60d7B500252e19",
+              LyraTSAShareHandlerDepositHook:
+                "0xB054a628027B974Cd1289eb0f73F47Bd0A1F010c",
+              connectors: {
+                957: { FAST: "0xeBB5D642aA8ccDeE98373D6aC3ee0602b63824b3" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2",
+              Vault: "0xFE00C281729fa7E7AaB453690ed184284F51268C",
+              LyraTSADepositHook: "0x218661f041638FaADC4F896Db379457C9860850b",
+              connectors: {
+                957: { FAST: "0xf7eFFD77BD355a9992A46B89d57800aA5eA96696" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+            DAI: {
+              isAppChain: false,
+              NonMintableToken: "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",
+              Vault: "0xb57D0EBC142eE63160d7B68B6E4C72D98053C539",
+              LyraTSAShareHandlerDepositHook:
+                "0xacFf704e1C8919094C1058B389840975DB73013f",
+              connectors: {
+                957: { FAST: "0xF8d4950Dc489790e3fE77533f3a47d829486B222" },
+              },
+            },
+            sDAI: {
+              isAppChain: false,
+              NonMintableToken: "0x99ac4484e8a1dbd6a185380b3a811913ac884d87",
+              Vault: "0xb2aD65aEffD5EEb28ce13d318A83c89461B2b444",
+              LyraTSAShareHandlerDepositHook:
+                "0x446E28bd9D3b5FdEA5a7837FA035EB410ABfCe4D",
+              connectors: {
+                957: { FAST: "0xd49c6623AD449e2f9648C61A253Ff30C7A6B73c9" },
+              },
+            },
+            USDe: {
+              isAppChain: false,
+              NonMintableToken: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+              Vault: "0x3BcB0FF2D4B674784ac1c33bc85a047b5a726E71",
+              LyraTSAShareHandlerDepositHook:
+                "0x23F2E0C64aE525948A8b13935d8c180D8590764b",
+              connectors: {
+                957: { FAST: "0x10Aa306840b822B8Bd6C025226C2956a9B0d5588" },
+              },
+            },
+            cbBTC: {
+              isAppChain: false,
+              NonMintableToken: "0xcbB7C0000aB88B473b1f5aFd9ef808440eed33Bf",
+              Vault: "0x76624ff43D610F64177Bb9c194A2503642e9B803",
+              LyraTSAShareHandlerDepositHook:
+                "0x5Fc48A32437Ff4BBab2A22646c3c9344ba003971",
+              connectors: {
+                957: { FAST: "0x457379de638CAFeB1759a22457fe893b288E2e89" },
+              },
+            },
+            SolvBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x3b86ad95859b6ab773f55f8d94b4b9d443ee931f",
+              Vault: "0x084f3AbC5d860eAEA7C6c6539DCbEeE20D04f344",
+              LyraTSAShareHandlerDepositHook:
+                "0xdB34e1E9b59f12049c942AFE9B3dB484ca7EEF65",
+              connectors: {
+                957: { FAST: "0x1603FF3E0BFaFa9BB84E57582bD89F79be7Fd44e" },
+              },
+            },
+            SolvBTCBBN: {
+              isAppChain: false,
+              NonMintableToken: "0xC26C9099BD3789107888c35bb41178079B282561",
+              Vault: "0x88C43DEA65eDE0C56Be663550E831BE97745bec2",
+              LyraTSAShareHandlerDepositHook:
+                "0xe52E40646de5532B77f4fB87247730Fa7368165d",
+              connectors: {
+                957: { FAST: "0xeb9E66047208a47F67EA58223023212868a9ed67" },
+              },
+            },
+            LBTC: {
+              isAppChain: false,
+              NonMintableToken: "0xecac9c5f704e954931349da37f60e39f515c11c1",
+              Vault: "0xB29D27DF122833aa38Da3eb816B0EFcEE09cdBA8",
+              LyraTSAShareHandlerDepositHook:
+                "0xb0c6e0B207d3b7456c86C8afB3200aa33B7c476f",
+              connectors: {
+                957: { FAST: "0x8f1DceD9AA9E0da020D27fECB39e2fA2C8B9575d" },
+              },
+            },
+            OLAS: {
+              isAppChain: false,
+              NonMintableToken: "0x54330d28ca3357f294334bdc454a032e7f353416",
+              Vault: "0x6312A07400651e0F324c5772413fC9A7c535684e",
+              LyraTSAShareHandlerDepositHook:
+                "0x61Af340415B35ee4492d7455ac004923bcE12544",
+              connectors: {
+                957: { FAST: "0x590825d895974Fb4C4E79Dc79db4aA6c6A8BEb0B" },
+              },
+            },
+            AAVE: {
+              isAppChain: false,
+              NonMintableToken: "0x63706e401c06ac8513145b7687a14804d17f814b",
+              Vault: "0x420446557AdB05Fa0eCcA96619cD9F20e1e044dc",
+              LyraTSAShareHandlerDepositHook:
+                "0x3a914B9e15F782D4bFa28C75CE1d5a61f0895d2C",
+              connectors: {
+                957: { FAST: "0x5BE8778Aeb491aB43fcAA23BfCe0F83101E7Dd99" },
+              },
+            },
+            cbADA: {
+              isAppChain: false,
+              NonMintableToken: "0xcbada732173e39521cdbe8bf59a6dc85a9fc7b8c",
+              Vault: "0xE9C464957Cc4Fd2766F2D7e289DAE582C6c03207",
+              LyraTSAShareHandlerDepositHook:
+                "0xaC192A3a71377f9cd51752438cd680418fb803c7",
+              connectors: {
+                957: { FAST: "0x67c97Bd542B3a7F1F1EcF85CBC4409421ccAe971" },
+              },
+            },
+          },
+          34443: {
+            weETH: {
+              isAppChain: false,
+              NonMintableToken: "0x04c0599ae5a44757c0af6f9ec3b93da8976c150a",
+              Vault: "0x8574CBC539c26Df9ec11bA283218268101ff10e1",
+              LyraTSAShareHandlerDepositHook:
+                "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+              connectors: {
+                957: { FAST: "0xE7603DF191D699d8BD9891b821347dbAb889E5a5" },
+              },
+            },
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0xe7903B1F75C534Dd8159b313d92cDCfbC62cB3Cd",
+              Vault: "0xAA8f9D05599F1a5d5929c40342c06a5Da063a4dE",
+              LyraTSAShareHandlerDepositHook:
+                "0x28c9ddF9A3B29c2E6a561c1BC520954e5A33de5D",
+              connectors: {
+                957: { FAST: "0x9C61888497D716f5bBd93D5e13d443cC375f1424" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2",
+              Vault: "0xdE45E2bCCb99E0ed1a2876cFC51a71ca5e822641",
+              LyraTSADepositHook: "0x4061DF0f966Da2E7d973F9f532df87DD7a38DF75",
+              connectors: {
+                957: { FAST: "0xBAC2a42DcF694cEdCDcBE14a7f40AC84A3c6A9Eb" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+          },
+          42161: {
+            weETH: {
+              isAppChain: false,
+              NonMintableToken: "0x35751007a407ca6feffe80b3cb397736d2cf4dbe",
+              Vault: "0x3FBFD80EF7591658d1D7DdEC067F413eFd6f985c",
+              LyraTSAShareHandlerDepositHook:
+                "0xd8d46a044f62d97733707176D6791b0a73cd7f6C",
+              connectors: {
+                957: { FAST: "0xBd282333710B9C7e33E8a37d027885A7C079Ae23" },
+              },
+            },
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0x4186BFC76E2E237523CBC30FD220FE055156b41F",
+              Vault: "0x486936FB1CE805e8C46E71C69256e72f3f550d38",
+              LyraTSAShareHandlerDepositHook:
+                "0x5dBF223e4D59eb8d860D69f3d1326B3497630aA8",
+              connectors: {
+                957: { FAST: "0x59729095f131Ff2cb4c3F647EdcfE26eE8dB6C61" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2",
+              Vault: "0x3c143EA5eBaB50ad6D2B2d14FA719234d1d38F1b",
+              LyraTSADepositHook: "0x66237B77330f000c00B38EeA3f9378294c3942A1",
+              connectors: {
+                957: { FAST: "0xAc0c4B009efF095AD90c43a3B6dF097e835B0c62" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+            DAI: {
+              isAppChain: false,
+              NonMintableToken: "0xda10009cbd5d07dd0cecc66161fc93d7c9000da1",
+              Vault: "0x2B93891dc80ab9696814615f553fd15a3b98d3a2",
+              LyraTSAShareHandlerDepositHook:
+                "0x876b81F74AD47cF10e5D62aAAc80f9E99f5587FC",
+              connectors: {
+                957: { FAST: "0xA72bc51f800127621d4Ab541E7Bb70B86Fe88F0F" },
+              },
+            },
+            USDe: {
+              isAppChain: false,
+              NonMintableToken: "0x5d3a1Ff2b6BAb83b63cd9AD0787074081a52ef34",
+              Vault: "0x5fAA613365331A5062F3A00126954b742aBEb2FF",
+              LyraTSAShareHandlerDepositHook:
+                "0x7348453dE2441882274d43c125df1348039185F5",
+              connectors: {
+                957: { FAST: "0x982937790Fe066DA8d8164256B58feCa1AB00c18" },
+              },
+            },
+            SolvBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x3647c54c4c2c65bc7a2d63c0da2809b399dbbdc0",
+              Vault: "0xE3E96892D30E0ee1a8131BAf87c891201F7137bf",
+              LyraTSAShareHandlerDepositHook:
+                "0xAF3f1CDd6Fcf67D22dA8C8D4871bafc518b3eD5d",
+              connectors: {
+                957: { FAST: "0xfa8c07E28461eb7c65b33De024DB97eE4C052C97" },
+              },
+            },
+            SolvBTCBBN: {
+              isAppChain: false,
+              NonMintableToken: "0x346c574C56e1A4aAa8dc88Cda8F7EB12b39947aB",
+              Vault: "0x05DD3bbB786beb8551DFe0D2EcA3De47B3996003",
+              LyraTSAShareHandlerDepositHook:
+                "0xf7eB3B2B5aFfB437Bb1b756A3B887a6e8d846C67",
+              connectors: {
+                957: { FAST: "0x8e875Cc9022666011D07239fC06DB95E7068FCd2" },
+              },
+            },
+            OLAS: {
+              isAppChain: false,
+              NonMintableToken: "0x064f8b858c2a603e1b106a2039f5446d32dc81c1",
+              Vault: "0x4518308f435F5cf08952D8eB2e1be33a49B6Ba08",
+              LyraTSAShareHandlerDepositHook:
+                "0xACb06c7B484b624525e1Fd530B085CA035F378f9",
+              connectors: {
+                957: { FAST: "0x2a9e2E08FB67F702005d591285F4c52BeE7F995C" },
+              },
+            },
+            AAVE: {
+              isAppChain: false,
+              NonMintableToken: "0xba5ddd1f9d7f570dc94a51479a000e3bce967196",
+              Vault: "0x8a8725e2a6D5fc50605A1eF8D81fA9F214E6d320",
+              LyraTSAShareHandlerDepositHook:
+                "0x83Ee0e92A598e4Cc19F8fdB03e72bCbFEdC817cC",
+              connectors: {
+                957: { FAST: "0x990477A6192ca21f079D8AC8e0Bd4edFDD5f5906" },
+              },
+            },
+          },
+          43111: {
+            HEMIBTC: {
+              isAppChain: false,
+              NonMintableToken: "0xaa40c0c7644e0b2b224509571e10ad20d9c4ef28",
+              Vault: "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+              LyraTSAShareHandlerDepositHook:
+                "0xE7603DF191D699d8BD9891b821347dbAb889E5a5",
+              connectors: {
+                957: { FAST: "0x4e798659b9846F1da7B6D6B5d09d581270aB6FEC" },
+              },
+            },
+          },
+          81457: {
+            weETH: {
+              isAppChain: false,
+              NonMintableToken: "0x04C0599Ae5A44757c0af6F9eC3b93da8976c150A",
+              Vault: "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+              LyraTSAShareHandlerDepositHook:
+                "0xE7603DF191D699d8BD9891b821347dbAb889E5a5",
+              connectors: {
+                957: { FAST: "0x4e798659b9846F1da7B6D6B5d09d581270aB6FEC" },
+              },
+            },
+            rsETH: {
+              isAppChain: false,
+              NonMintableToken: "0xe7903b1f75c534dd8159b313d92cdcfbc62cb3cd",
+              Vault: "0x28c9ddF9A3B29c2E6a561c1BC520954e5A33de5D",
+              LyraTSAShareHandlerDepositHook:
+                "0x9C61888497D716f5bBd93D5e13d443cC375f1424",
+              connectors: {
+                957: { FAST: "0xea8c58aADfAfA579Df6443EDE307199FFfE0320B" },
+              },
+            },
+            sUSDe: {
+              isAppChain: false,
+              NonMintableToken: "0x211cc4dd073734da055fbf44a2b4667d5e5fe5d2",
+              Vault: "0x837808498206FBb5C758D79424Cc3DCAD5d9E873",
+              LyraTSADepositHook: "0x8a420fb1A1ce8D90645571Ed571D1928672a9033",
+              connectors: {
+                957: { FAST: "0x9a8Ca568301d26d03445354e9eB7228C4F8Ee496" },
+              },
+              LyraTSAShareHandlerDepositHook:
+                "0x67e4DBF6865D0bB341fbF27BC4555e5Cb440b660",
+            },
+          },
+        },
+        "lyra-old": {
+          1: {
+            USDC: {
+              isAppChain: false,
+              NonMintableToken: "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+              Vault: "0x6D303CEE7959f814042D31E0624fB88Ec6fbcC1d",
+              connectors: {
+                957: {
+                  FAST: "0x200AF8FCdD5246D70B369A98143Ac8930A077B7A",
+                  NATIVE_BRIDGE: "0x22d8360eB04F46195c7B02A66658C375948d8A99",
+                },
+              },
+            },
+            WETH: {
+              isAppChain: false,
+              NonMintableToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+              Vault: "0xD4efe33C66B8CdE33B8896a2126E41e5dB571b7e",
+              connectors: {
+                957: {
+                  FAST: "0xCf814e58f1649F94d37E51f730D6bF72409fA09c",
+                  NATIVE_BRIDGE: "0xf71A92D4bEFc2e18671c3b20377d45729790e880",
+                },
+              },
+            },
+            "WETH-strat": {
+              isAppChain: false,
+              NonMintableToken: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+              Vault: "0x9371352CCef6f5b36EfDFE90942fFE622Ab77F1D",
+              connectors: {
+                957: { FAST: "0xDb39c6502e6DaaC4d9EFe6383029bda464ea043c" },
+              },
+            },
+            WBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
+              Vault: "0x3Eec7c855aF33280F1eD38b93059F5aa5862E3ab",
+              connectors: {
+                957: {
+                  FAST: "0xA621Bc5A9d13D39eb098865B723CEee71BB5C181",
+                  NATIVE_BRIDGE: "0xceA535B2a0A690ebA76ac6A4AF2A1ee7B9Fed1aa",
+                },
+              },
+            },
+            USDT: {
+              isAppChain: false,
+              NonMintableToken: "0xdac17f958d2ee523a2206206994597c13d831ec7",
+              Vault: "0x5e98A25d8d6FF69A8992d6Aa57948dFB77D4ECBa",
+              connectors: {
+                957: {
+                  FAST: "0x02D53793b18d032Cd94d745F7586C6F66F83f8e3",
+                  NATIVE_BRIDGE: "0x3553c0102684c20e2f8192d6F013c7242710b4b3",
+                },
+              },
+            },
+            SNX: {
+              isAppChain: false,
+              NonMintableToken: "0xc011a73ee8576fb46f5e1c5751ca3b9fe0af2a6f",
+              Vault: "0x7D7aC8d55A9bD4152b703011f3E61AB3bB0A5592",
+              connectors: {
+                957: {
+                  FAST: "0x68411d61adF1341A6392C87A93941FdD3EE7DF8E",
+                  NATIVE_BRIDGE: "0x8F4e67C61232167584333e23D7d67BD73d80a4F5",
+                },
+              },
+            },
+            wstETH: {
+              isAppChain: false,
+              NonMintableToken: "0x7f39c581f595b53c5cb19bd0b3f8da6c935e2ca0",
+              Vault: "0xeBB5D642aA8ccDeE98373D6aC3ee0602b63824b3",
+              connectors: {
+                957: {
+                  FAST: "0xdCcFb24f983586144c085426dbfa3414045E19a3",
+                  NATIVE_BRIDGE: "0x727aD65db6aE99DB5Dbee8F202846DD6009bf6D5",
+                },
+              },
+            },
+          },
+          10: {
+            USDC: {
+              isAppChain: false,
+              NonMintableToken: "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+              Vault: "0xDEf0bfBdf7530C75AB3C73f8d2F64d9eaA7aA98e",
+              connectors: {
+                957: { FAST: "0xfd76d8b79C2E2c86EA0814e92D5cA0e4E8096c13" },
+              },
+            },
+            "USDC.e": {
+              isAppChain: false,
+              NonMintableToken: "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
+              Vault: "0xBb9CF28Bc1B41c5c7c76Ee1B2722C33eBB8fbD8C",
+              connectors: {
+                957: { FAST: "0xC0acBb471465FCf848746D1837d8358aB891546c" },
+              },
+            },
+            WETH: {
+              isAppChain: false,
+              NonMintableToken: "0x4200000000000000000000000000000000000006",
+              Vault: "0xdD4c717a69763176d8B7A687728e228597eAB86d",
+              connectors: {
+                957: { FAST: "0x27f4B23944e2bb59b1E276aff22FD2Be45658F64" },
+              },
+            },
+            WBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x68f180fcce6836688e9084f035309e29bf0a2095",
+              Vault: "0xE5967877065f111a556850d8f05b8DaD88edCEc9",
+              connectors: {
+                957: { FAST: "0x906A44Daa8bdA5599a384264e3811b9BeA1109b4" },
+              },
+            },
+            USDT: {
+              isAppChain: false,
+              NonMintableToken: "0x94b008aa00579c1307b0ef2c499ad98a8ce58e58",
+              Vault: "0x44343AE5e9319b61c9DaD7876919eFdB03241b02",
+              connectors: {
+                957: { FAST: "0x242b28863Be371D5EB9B32692DC642e446064aA5" },
+              },
+            },
+            SNX: {
+              isAppChain: false,
+              NonMintableToken: "0x8700daec35af8ff88c16bdf0418774cb3d7599b4",
+              Vault: "0x8574CBC539c26Df9ec11bA283218268101ff10e1",
+              connectors: {
+                957: { FAST: "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9" },
+              },
+            },
+            wstETH: {
+              isAppChain: false,
+              Vault: "0xAA8f9D05599F1a5d5929c40342c06a5Da063a4dE",
+              NonMintableToken: "0x1F32b1c2345538c0c6f582fCB022739c4A194Ebb",
+              connectors: {
+                957: { FAST: "0x28c9ddF9A3B29c2E6a561c1BC520954e5A33de5D" },
+              },
+            },
+          },
+          957: {
+            USDC: {
+              isAppChain: true,
+              MintableToken: "0x6879287835A86F50f784313dBEd5E5cCC5bb8481",
+              ExchangeRate: "0x64107EB9DC50E79Fb3977b9D6C927f9B9C5Bd218",
+              Controller: "0x4C9faD010D8be90Aba505c85eacc483dFf9b8Fa9",
+              connectors: {
+                1: {
+                  FAST: "0x1281C1464449DB73bdAa30928BCC63Dc25D8D187",
+                  NATIVE_BRIDGE: "0x19609EeE157BC38E1A40E19c38218fC3900d97ac",
+                },
+                10: { FAST: "0x8d169dA827971aC5CEed406d3195614e297c648F" },
+                8453: { FAST: "0x3EB5b734ad67DE2aF9fb43a4bF1d676D50256D05" },
+                42161: { FAST: "0xBdE9e687F3A23Ebbc972c58D510dfc1f58Fb35EF" },
+              },
+            },
+            "USDC.e": {
+              isAppChain: true,
+              MintableToken: "0x6879287835A86F50f784313dBEd5E5cCC5bb8481",
+              ExchangeRate: "0x64107EB9DC50E79Fb3977b9D6C927f9B9C5Bd218",
+              Controller: "0x4C9faD010D8be90Aba505c85eacc483dFf9b8Fa9",
+              connectors: {
+                10: { FAST: "0xe821234B2e1B66F23e3bA48b50E7cFD2724ba971" },
+                42161: { FAST: "0xFc1e42b0C3Ff8d69FBe639a6a674fF5f0FcE778D" },
+              },
+            },
+            WETH: {
+              isAppChain: true,
+              MintableToken: "0x15CEcd5190A43C7798dD2058308781D0662e678E",
+              ExchangeRate: "0x64107EB9DC50E79Fb3977b9D6C927f9B9C5Bd218",
+              Controller: "0x92728d330d024b19332419D5c5aa59887A2862d6",
+              connectors: {
+                1: {
+                  FAST: "0x8487daa5864a5cE18E5a89406c11EC748da33fbB",
+                  NATIVE_BRIDGE: "0x4BFDf43662cdf2Cc0A96C8697AC179819B6E5E91",
+                },
+                10: { FAST: "0xAAeB4b20521dDf5C8C90c2a39D3c28F224E08c52" },
+                8453: { FAST: "0xA98b4F5d5679d584DFc13F381D34DA83fE2b3886" },
+                42161: { FAST: "0xE49B4fE6F37e1814520E529eC1A7A9AC118ec77d" },
+              },
+            },
+            "WETH-strat": {
+              isAppChain: true,
+              ExchangeRate: "0xd46A171AFE43C5563DBa1C9D627854EF470c75C2",
+              MintableToken: "0x15CEcd5190A43C7798dD2058308781D0662e678E",
+              Controller: "0x55a5BDa19900D8Aa4F97c0Fd96b761CbCB1a44cD",
+              connectors: {
+                1: { FAST: "0xDc39b141aDA0F30d52F51801A6bA5A191994D9ff" },
+              },
+            },
+            WBTC: {
+              isAppChain: true,
+              MintableToken: "0x9b80ab732a6F1030326Af0014f106E12C4Db18EC",
+              ExchangeRate: "0x64107EB9DC50E79Fb3977b9D6C927f9B9C5Bd218",
+              Controller: "0xaf33761742beF3B7d0D0726671660CCF260fc5c3",
+              connectors: {
+                1: {
+                  FAST: "0xa3f9a7a13055f37479Ebc28E57C005F5c9A31F68",
+                  NATIVE_BRIDGE: "0x4c0623EC2cB2B1f1a5A19e18AB9a2Df897E1f746",
+                },
+                10: { FAST: "0xC50Abb760555f73CCCa8C4D4ff56D4Bd4AAAAfC9" },
+                42161: { FAST: "0x26E5CE884875ea3776a57f0B225b1Ea8D2E9bEeB" },
+              },
+            },
+            USDT: {
+              isAppChain: true,
+              MintableToken: "0x954bE1803546150bfd887c9ff70fd221F2F505d3",
+              ExchangeRate: "0x64107EB9DC50E79Fb3977b9D6C927f9B9C5Bd218",
+              Controller: "0xF64010ACE8f7333dF61F6D0ae3d08C5d4704D69A",
+              connectors: {
+                1: {
+                  FAST: "0x0e276315EB155d28C7Aebd78AC118F967277a265",
+                  NATIVE_BRIDGE: "0xA78426325b5e32Affd5f4Bc8ab6575B24DCB1762",
+                },
+                10: { FAST: "0xfD6d6D95eC911b2415F34C93d1a74e0c67E49370" },
+                42161: { FAST: "0x56aDAD63615A2605aF3F00C34DC4caD1AFaed5bF" },
+              },
+            },
+            SNX: {
+              isAppChain: true,
+              MintableToken: "0xE4e6F3feeAD9C3714F3c9380F91CB56E04F7297E",
+              ExchangeRate: "0x5Ed056B2AA13E19c5CCd4624F3e93C1B621faD5A",
+              Controller: "0xB7CD8Ba2101E9329d447D120F0C488bdc66bB673",
+              connectors: {
+                1: {
+                  FAST: "0x9dCDdd01db4b9461bFe05B261B81ee1535fC0551",
+                  NATIVE_BRIDGE: "0x1BC7FFbEc8F8Cb99298f28E2dc4B0Aea35ECb34E",
+                },
+                10: { FAST: "0x77cBb9eFd99ebDB3aDA133Ae0c4e9C9d0d1Ca427" },
+              },
+            },
+            wstETH: {
+              isAppChain: true,
+              MintableToken: "0xdf77b286eDa539CCb6326e9eDB86aa69D83108a5",
+              ExchangeRate: "0xD6787D550f9dFC157575264C4fFD1cCCeaDe547E",
+              Controller: "0x760c8D80905dCE001E9f0982F3Eb7722C342DecF",
+              connectors: {
+                1: {
+                  FAST: "0x03490730DFAb89f2468da469C5459156F85a69f8",
+                  NATIVE_BRIDGE: "0xd15158d22929849Aa01fE527bcfadBa6821C80Ab",
+                },
+                10: { FAST: "0x81405706a4E317eFf7a7154E600ADD19Da2dB80d" },
+                8453: { FAST: "0x27F596952389Cb0489AABeC829ADF44c775625e5" },
+                42161: { FAST: "0x122B8c35acC306f89191ceB76FD533620B9C8945" },
+              },
+            },
+          },
+          8453: {
+            USDC: {
+              isAppChain: false,
+              NonMintableToken: "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+              Vault: "0x4e798659b9846F1da7B6D6B5d09d581270aB6FEC",
+              connectors: {
+                957: { FAST: "0x57B03E14d409ADC7fAb6CFc44b5886CAD2D5f02b" },
+              },
+            },
+            wstETH: {
+              isAppChain: false,
+              NonMintableToken: "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+              Vault: "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9",
+              connectors: {
+                957: { FAST: "0xE7603DF191D699d8BD9891b821347dbAb889E5a5" },
+              },
+            },
+            WETH: {
+              isAppChain: false,
+              NonMintableToken: "0x4200000000000000000000000000000000000006",
+              Vault: "0xBd282333710B9C7e33E8a37d027885A7C079Ae23",
+              connectors: {
+                957: { FAST: "0xbE9DBda519e15a1c0d238cEa0b3daD47a484A6Ff" },
+              },
+            },
+          },
+          42161: {
+            USDC: {
+              isAppChain: false,
+              NonMintableToken: "0xaf88d065e77c8cC2239327C5EDb3A432268e5831",
+              Vault: "0x5e027ad442e031424b5a2C0ad6f656662Be32882",
+              connectors: {
+                957: { FAST: "0x17Fc4c7ea8267044b6D0ACC17a6C049Bed6F8B21" },
+              },
+            },
+            "USDC.e": {
+              isAppChain: false,
+              NonMintableToken: "0xFF970A61A04b1cA14834A43f5dE4533eBDDB5CC8",
+              Vault: "0xFB7B06538d837e4212D72E2A38e6c074F9076E0B",
+              connectors: {
+                957: { FAST: "0x7DEb2459a366D4f85AB5E89f31Be527348a672ca" },
+              },
+            },
+            WETH: {
+              isAppChain: false,
+              NonMintableToken: "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+              Vault: "0x8e9f58E6c206CB9C98aBb9F235E0f02D65dFc922",
+              connectors: {
+                957: { FAST: "0x3809150509df79D96334c4EB6Ba1c386827C3c67" },
+              },
+            },
+            WBTC: {
+              isAppChain: false,
+              NonMintableToken: "0x2f2a2543b76a4166549f7aab2e75bef0aefc5b0f",
+              Vault: "0x3D20c6A2b719129af175E0ff7B1875DEb360896f",
+              connectors: {
+                957: { FAST: "0x42c846313c37845B9d67BB5c1F4F48E528234Afc" },
+              },
+            },
+            USDT: {
+              isAppChain: false,
+              NonMintableToken: "0xfd086bc7cd5c481dcc9c85ebe478a1c0b69fcbb9",
+              Vault: "0xb2Cb9aDA6e00118dA8E83a6A53dF1EC6331A60a6",
+              connectors: {
+                957: { FAST: "0xDC56509f941884a0C047413d6973E2F00D763288" },
+              },
+            },
+            wstETH: {
+              isAppChain: false,
+              Vault: "0x8574CBC539c26Df9ec11bA283218268101ff10e1",
+              NonMintableToken: "0x5979D7b546E38E414F7E9822514be443A4800529",
+              connectors: {
+                957: { FAST: "0x2805B908a0F9CA58a2b3b7900341b4EBd0B994e9" },
+              },
+            },
+          },
+        },
+      }; /*@@DEPLOYMENTS_END@@*/
+
+      const DEPLOYMENT_FILES = {
+        lyra: "../../deployments/superbridge/prod_lyra_addresses.json",
+        "lyra-old":
+          "../../deployments/superbridge/prod_lyra-old_addresses.json",
+      };
+
+      async function loadDeployments() {
+        const out = {};
+        let live = 0;
+        for (const [dep, path] of Object.entries(DEPLOYMENT_FILES)) {
+          try {
+            const r = await fetch(path, { cache: "no-store" });
+            if (!r.ok) throw new Error(r.status);
+            out[dep] = await r.json();
+            live++;
+          } catch (e) {
+            if (EMBEDDED_DEPLOYMENTS && EMBEDDED_DEPLOYMENTS[dep])
+              out[dep] = EMBEDDED_DEPLOYMENTS[dep];
+          }
+        }
+        return { deployments: out, live };
+      }
+
+      /* ------------------------------------------------------------ rpc helpers */
+
+      const abi = ethers.utils.defaultAbiCoder;
+      const sel = (sig) => ethers.utils.id(sig).slice(0, 10);
+      const SEL = {
+        symbol: sel("symbol()"),
+        decimals: sel("decimals()"),
+        balanceOf: sel("balanceOf(address)"),
+        oftVersion: sel("oftVersion()"),
+        token: sel("token()"),
+        sharedDecimals: sel("sharedDecimals()"),
+        remoteToken: sel("remoteToken()"),
+        l1Token: sel("l1Token()"),
+        l2Bridge: sel("l2Bridge()"),
+        bridge: sel("bridge()"),
+        l1Address: sel("l1Address()"),
+        l2Gateway: sel("l2Gateway()"),
+        masterMinter: sel("masterMinter()"),
+        connectorPoolIds: sel("connectorPoolIds(address)"),
+        poolLockedAmounts: sel("poolLockedAmounts(uint256)"),
+      };
+      const PROBES = [
+        "oftVersion",
+        "token",
+        "sharedDecimals",
+        "remoteToken",
+        "l1Token",
+        "l2Bridge",
+        "bridge",
+        "l1Address",
+        "l2Gateway",
+        "masterMinter",
+      ];
+
+      const mcIface = new ethers.utils.Interface([
+        "function tryAggregate(bool requireSuccess, tuple(address target, bytes callData)[] calls) view returns (tuple(bool success, bytes returnData)[] returnData)",
+      ]);
+
+      function rpcList(chainId) {
+        const q = new URLSearchParams(location.search).get("rpc." + chainId);
+        const list = CHAINS[chainId].rpcs.slice();
+        if (q) list.unshift(q);
+        return list;
+      }
+
+      async function rpcCall(chainId, method, params) {
+        let lastErr;
+        for (const url of rpcList(chainId)) {
+          const ctl = new AbortController();
+          const timer = setTimeout(() => ctl.abort(), 20000);
+          try {
+            const r = await fetch(url, {
+              method: "POST",
+              signal: ctl.signal,
+              headers: { "content-type": "application/json" },
+              body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+            });
+            const j = await r.json();
+            if (j.error)
+              throw new Error(j.error.message || JSON.stringify(j.error));
+            if (j.result === undefined) throw new Error("empty result");
+            return j.result;
+          } catch (e) {
+            lastErr = new Error(`${new URL(url).host}: ${e.message}`);
+          } finally {
+            clearTimeout(timer);
+          }
+        }
+        throw lastErr || new Error("no rpc");
+      }
+
+      async function multicall(chainId, calls) {
+        const out = [];
+        for (let i = 0; i < calls.length; i += MC_CHUNK) {
+          const slice = calls.slice(i, i + MC_CHUNK);
+          const data = mcIface.encodeFunctionData("tryAggregate", [
+            false,
+            slice,
+          ]);
+          const res = await rpcCall(chainId, "eth_call", [
+            { to: MULTICALL3, data },
+            "latest",
+          ]);
+          out.push(...mcIface.decodeFunctionResult("tryAggregate", res)[0]);
+        }
+        return out;
+      }
+
+      const okWord = (r) =>
+        r.success && r.returnData && r.returnData.length >= 66;
+      const decAddr = (r) => (okWord(r) ? "0x" + r.returnData.slice(26) : null);
+      const nonZeroAddr = (r) => {
+        const a = decAddr(r);
+        return a && !/^0x0{40}$/.test(a) ? a : null;
+      };
+      const decUint = (r) =>
+        okWord(r) ? BigInt(r.returnData.slice(0, 66)) : null;
+      function decString(r) {
+        if (!okWord(r)) return null;
+        try {
+          return abi.decode(["string"], r.returnData)[0];
+        } catch {
+          try {
+            return ethers.utils.parseBytes32String(r.returnData.slice(0, 66));
+          } catch {
+            return null;
+          }
+        }
+      }
+
+      /* ------------------------------------------------------------ row model */
+
+      const state = {
+        rows: [],
+        app: {}, // dep -> token -> {controller, hook, mintable, connectors}
+        chainStatus: {}, // chainId -> {state:'wait'|'ok'|'bad', msg}
+        priceStatus: { state: "wait", msg: "" },
+        poolStatus: { state: "wait", msg: "" },
+        prices: {}, // 'llama:addr' lowercase -> price
+        loadedAt: null,
+        sort: { key: "value", dir: -1 },
+        source: "",
+      };
+
+      function buildRows(deployments) {
+        const rows = [];
+        const app = {};
+        for (const [dep, chains] of Object.entries(deployments)) {
+          app[dep] = {};
+          for (const [chainStr, tokens] of Object.entries(chains)) {
+            const chainId = Number(chainStr);
+            for (const [token, d] of Object.entries(tokens)) {
+              if (d.Controller && d.MintableToken && chainId === APP_CHAIN) {
+                app[dep][token] = {
+                  controller: d.Controller,
+                  mintable: d.MintableToken,
+                  hook:
+                    d.LyraTSAShareHandlerDepositHook ||
+                    d.LyraTSADepositHook ||
+                    null,
+                  connectors: d.connectors || {},
+                };
+              }
+              if (!d.Vault || !d.NonMintableToken) continue;
+              if (!CHAINS[chainId]) continue;
+              rows.push({
+                id: `${dep}|${token}|${chainId}`,
+                dep,
+                token,
+                chainId,
+                address: d.NonMintableToken,
+                vault: d.Vault,
+                symbol: null,
+                decimals: null,
+                balance: null,
+                pool: null,
+                price: null,
+                value: null,
+                probe: {},
+                probed: false,
+                error: null,
+                cls: null,
+              });
+            }
+          }
+        }
+        return { rows, app };
+      }
+
+      /* ------------------------------------------------------- classification */
+
+      function classify(row) {
+        const custom = CUSTOM_LZ.has(row.token.toUpperCase());
+        const v3 = custom ? "custom LZ" : "native";
+        const key = `${row.chainId}:${row.address.toLowerCase()}`;
+        const base = { v3, isL1: row.chainId === 1, note: NOTES[key] || "" };
+
+        if (row.chainId === 1)
+          return {
+            ...base,
+            mech: "Already on Ethereum",
+            minutes: 0,
+            bucket: "l1",
+            source: "chain",
+          };
+        if (custom)
+          return {
+            ...base,
+            mech: "Custom LayerZero (v3 plan)",
+            minutes: 5,
+            bucket: "instant",
+            source: "rule",
+          };
+        if (MANUAL[key])
+          return {
+            ...base,
+            ...MANUAL[key],
+            bucket: bucketFor(MANUAL[key].minutes),
+            source: "manual",
+          };
+        if (!row.probed)
+          return {
+            ...base,
+            mech: "probing…",
+            minutes: null,
+            bucket: "pending",
+            source: "",
+          };
+
+        const p = row.probe;
+        let mech = null,
+          minutes = null;
+        if (p.oftVersion && p.token && p.sharedDecimals) {
+          mech = "LayerZero OFT";
+          minutes = 5;
+        } else if (p.token && p.sharedDecimals) {
+          mech = "LayerZero OFT (v1)";
+          minutes = 5;
+        } else if (CCTP_USDC.has(key)) {
+          mech = "Circle CCTP";
+          minutes = 15;
+        } else if ((p.remoteToken || p.l1Token) && (p.l2Bridge || p.bridge)) {
+          mech = "OP Stack Standard Bridge";
+          minutes = SEVEN_DAYS;
+        } else if (p.l1Address) {
+          mech = "Arbitrum canonical gateway";
+          minutes = SEVEN_DAYS;
+        } else if (p.bridge) {
+          mech = "Custom token on canonical bridge (bridge())";
+          minutes = SEVEN_DAYS;
+        } else if (p.masterMinter) {
+          mech = "Issuer mint/burn (Coinbase), no bridge";
+          minutes = 20;
+        }
+
+        if (!mech)
+          return {
+            ...base,
+            mech: "No bridge marker found",
+            minutes: null,
+            bucket: "unknown",
+            source: "detected",
+          };
+        return {
+          ...base,
+          mech,
+          minutes,
+          bucket: bucketFor(minutes),
+          source: "detected",
+        };
+      }
+
+      function bucketFor(minutes) {
+        if (minutes === null || minutes === undefined) return "unknown";
+        return minutes <= INSTANT_MINUTES ? "instant" : "slow";
+      }
+
+      function timeLabel(cls) {
+        if (cls.bucket === "l1") return "on L1";
+        if (cls.bucket === "instant") return "instant";
+        if (cls.bucket === "slow")
+          return cls.minutes >= SEVEN_DAYS
+            ? "~7 days"
+            : `~${Math.round(cls.minutes / 60)} h`;
+        if (cls.bucket === "pending") return "…";
+        return "unknown";
+      }
+      function minutesLabel(cls) {
+        if (
+          cls.minutes === null ||
+          cls.minutes === undefined ||
+          cls.bucket === "l1"
+        )
+          return "";
+        if (cls.minutes < 60) return `~${cls.minutes} min`;
+        if (cls.minutes < 1440) return `~${Math.round(cls.minutes / 60)} h`;
+        return `~${Math.round(cls.minutes / 1440)} d`;
+      }
+
+      /* ------------------------------------------------------------- fetching */
+
+      async function fetchChain(chainId, rows) {
+        const isL1 = chainId === 1;
+        const calls = [],
+          idx = [];
+        for (const row of rows) {
+          calls.push({ target: row.address, callData: SEL.symbol });
+          idx.push([row, "symbol"]);
+          calls.push({ target: row.address, callData: SEL.decimals });
+          idx.push([row, "decimals"]);
+          calls.push({
+            target: row.address,
+            callData:
+              SEL.balanceOf + abi.encode(["address"], [row.vault]).slice(2),
+          });
+          idx.push([row, "balance"]);
+          if (!isL1)
+            for (const k of PROBES) {
+              calls.push({ target: row.address, callData: SEL[k] });
+              idx.push([row, "probe:" + k]);
+            }
+        }
+        const res = await multicall(chainId, calls);
+        res.forEach((r, i) => {
+          const [row, what] = idx[i];
+          if (what === "symbol") row.symbol = decString(r);
+          else if (what === "decimals") {
+            const d = decUint(r);
+            row.decimals = d === null ? null : Number(d);
+          } else if (what === "balance") row.balance = decUint(r);
+          else {
+            const k = what.slice(6);
+            if (k === "sharedDecimals") row.probe[k] = decUint(r) !== null;
+            else if (k === "oftVersion") row.probe[k] = okWord(r);
+            else row.probe[k] = !!nonZeroAddr(r);
+          }
+        });
+        for (const row of rows) {
+          row.probed = true;
+          if (row.balance === null) row.error = "balanceOf failed";
+        }
+      }
+
+      async function fetchPools() {
+        const hookIface = new ethers.utils.Interface([
+          "function connectorPoolIds(address) view returns (uint256)",
+          "function poolLockedAmounts(uint256) view returns (uint256)",
+        ]);
+        const calls = [],
+          idx = [];
+        for (const [dep, tokens] of Object.entries(state.app)) {
+          for (const [token, a] of Object.entries(tokens)) {
+            const target = a.hook || a.controller;
+            for (const [sib, kinds] of Object.entries(a.connectors)) {
+              for (const addr of Object.values(kinds)) {
+                calls.push({
+                  target,
+                  callData: hookIface.encodeFunctionData("connectorPoolIds", [
+                    addr,
+                  ]),
+                });
+                idx.push({ dep, token, sib: Number(sib), target });
+              }
+            }
+          }
+        }
+        if (!calls.length) return;
+        const res = await multicall(APP_CHAIN, calls);
+        const byRow = new Map(); // rowId -> Set(pid)
+        const calls2 = [],
+          idx2 = [];
+        res.forEach((r, i) => {
+          const pid = decUint(r);
+          if (pid === null) return;
+          const { dep, token, sib, target } = idx[i];
+          const rowId = `${dep}|${token}|${sib}`;
+          if (!byRow.has(rowId)) byRow.set(rowId, new Set());
+          if (byRow.get(rowId).has(pid)) return;
+          byRow.get(rowId).add(pid);
+          calls2.push({
+            target,
+            callData: hookIface.encodeFunctionData("poolLockedAmounts", [pid]),
+          });
+          idx2.push(rowId);
+        });
+        const res2 = await multicall(APP_CHAIN, calls2);
+        const pools = new Map();
+        res2.forEach((r, i) => {
+          const amt = decUint(r);
+          if (amt === null) return;
+          pools.set(idx2[i], (pools.get(idx2[i]) ?? 0n) + amt);
+        });
+        for (const row of state.rows)
+          if (pools.has(row.id)) row.pool = pools.get(row.id);
+      }
+
+      async function fetchPrices() {
+        const ids = new Set();
+        for (const row of state.rows) {
+          const c = CHAINS[row.chainId];
+          if (c.llama) ids.add(`${c.llama}:${row.address}`);
+        }
+        const list = [...ids];
+        const found = {};
+        for (let i = 0; i < list.length; i += 40) {
+          const chunk = list.slice(i, i + 40);
+          const r = await fetch(
+            "https://coins.llama.fi/prices/current/" +
+              chunk.join(",") +
+              "?searchWidth=6h"
+          );
+          if (!r.ok) throw new Error("DefiLlama " + r.status);
+          const j = await r.json();
+          for (const [k, v] of Object.entries(j.coins || {}))
+            found[k.toLowerCase()] = v.price;
+        }
+        state.prices = found;
+        // Fallback: same deployment token on L1.
+        const l1ByToken = {};
+        for (const row of state.rows)
+          if (row.chainId === 1)
+            l1ByToken[row.token] = `ethereum:${row.address.toLowerCase()}`;
+        for (const row of state.rows) {
+          const c = CHAINS[row.chainId];
+          const key = c.llama
+            ? `${c.llama}:${row.address.toLowerCase()}`
+            : null;
+          let price = key && found[key] !== undefined ? found[key] : undefined;
+          if (
+            price === undefined &&
+            l1ByToken[row.token] &&
+            found[l1ByToken[row.token]] !== undefined
+          )
+            price = found[l1ByToken[row.token]];
+          row.price = price === undefined ? null : price;
+        }
+      }
+
+      function recompute() {
+        for (const row of state.rows) {
+          row.cls = classify(row);
+          if (
+            row.balance !== null &&
+            row.decimals !== null &&
+            row.price !== null
+          ) {
+            row.value = toNumber(row.balance, row.decimals) * row.price;
+          } else row.value = null;
+        }
+      }
+
+      /* ------------------------------------------------------------ formatting */
+
+      function toNumber(big, decimals) {
+        const s = big.toString().padStart(decimals + 1, "0");
+        const int = s.slice(0, s.length - decimals) || "0";
+        const frac = s.slice(s.length - decimals);
+        return Number(int + "." + frac);
+      }
+      const usdFull = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        maximumFractionDigits: 0,
+      });
+      const usdCompact = new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: "USD",
+        notation: "compact",
+        maximumFractionDigits: 2,
+      });
+      function fmtUSD(v) {
+        return v === null ? "–" : v > 0 && v < 1 ? "<$1" : usdFull.format(v);
+      }
+      function fmtAmount(big, decimals) {
+        if (big === null || decimals === null) return "–";
+        const n = toNumber(big, decimals);
+        if (n === 0) return "0";
+        const digits = n >= 1000 ? 0 : n >= 1 ? 2 : 6;
+        return n.toLocaleString("en-US", {
+          maximumFractionDigits: digits,
+          minimumFractionDigits: 0,
+        });
+      }
+      const shortAddr = (a) => a.slice(0, 6) + "…" + a.slice(-4);
+      const esc = (s) =>
+        String(s).replace(
+          /[&<>"']/g,
+          (c) =>
+            ({
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[c])
+        );
+
+      /* -------------------------------------------------------------- render */
+
+      const $ = (id) => document.getElementById(id);
+
+      function filteredRows() {
+        const dep = $("f-dep").value,
+          chain = $("f-chain").value,
+          bucket = $("f-bucket").value,
+          v3 = $("f-v3").value;
+        const hideZero = $("f-zero").checked,
+          q = $("f-q").value.trim().toLowerCase();
+        return state.rows.filter((r) => {
+          if (dep && r.dep !== dep) return false;
+          if (chain && String(r.chainId) !== chain) return false;
+          if (bucket && r.cls.bucket !== bucket) return false;
+          if (v3 && r.cls.v3 !== v3) return false;
+          if (hideZero && r.balance !== null && r.balance === 0n) return false;
+          if (
+            q &&
+            !`${r.token} ${r.symbol || ""} ${r.address} ${r.vault} ${
+              CHAINS[r.chainId].name
+            } ${r.dep}`
+              .toLowerCase()
+              .includes(q)
+          )
+            return false;
+          return true;
+        });
+      }
+
+      function sortKey(r, key) {
+        switch (key) {
+          case "token":
+            return r.token.toLowerCase();
+          case "chain":
+            return CHAINS[r.chainId].name;
+          case "dep":
+            return r.dep;
+          case "v3":
+            return r.cls.v3;
+          case "isL1":
+            return r.cls.isL1 ? 0 : 1;
+          case "minutes":
+            return r.cls.bucket === "l1"
+              ? -1
+              : r.cls.minutes === null
+              ? Infinity
+              : r.cls.minutes;
+          case "amount":
+            return r.balance === null
+              ? -1
+              : toNumber(r.balance, r.decimals ?? 18);
+          case "pool":
+            return r.pool === null ? -1 : toNumber(r.pool, r.decimals ?? 18);
+          case "value":
+          default:
+            return r.value ?? -1;
+        }
+      }
+
+      function render() {
+        recompute();
+        const rows = filteredRows();
+        const { key, dir } = state.sort;
+        rows.sort((a, b) => {
+          const ka = sortKey(a, key),
+            kb = sortKey(b, key);
+          if (ka < kb) return -1 * dir;
+          if (ka > kb) return 1 * dir;
+          return a.id < b.id ? -1 : 1;
+        });
+
+        document.querySelectorAll("th[data-sort]").forEach((th) => {
+          th.querySelector(".dir").textContent =
+            th.dataset.sort === key ? (dir === 1 ? "▲" : "▼") : "";
+          th.setAttribute(
+            "aria-sort",
+            th.dataset.sort === key
+              ? dir === 1
+                ? "ascending"
+                : "descending"
+              : "none"
+          );
+        });
+
+        const html = rows
+          .map((r) => {
+            const c = CHAINS[r.chainId],
+              cls = r.cls;
+            const zero = r.balance === 0n;
+            const alias =
+              r.symbol && r.symbol !== r.token
+                ? `<span class="alias">${esc(r.symbol)}</span>`
+                : "";
+            const timeChip = `<span class="chip t-${cls.bucket}">${timeLabel(
+              cls
+            )}</span>`;
+            const mins = minutesLabel(cls);
+            const mech = `<span class="mech">${esc(cls.mech)}${
+              mins ? ` · <span class="mins">${mins}</span>` : ""
+            }${
+              cls.source && cls.source !== "chain"
+                ? `<span class="src">${cls.source}</span>`
+                : ""
+            }${
+              cls.note ? `<br><span class="sub">${esc(cls.note)}</span>` : ""
+            }</span>`;
+            let poolCell = '<span class="pending">–</span>';
+            if (r.pool !== null && r.decimals !== null) {
+              let mismatch = false;
+              if (r.balance !== null) {
+                const a = toNumber(r.balance, r.decimals),
+                  b = toNumber(r.pool, r.decimals),
+                  m = Math.max(a, b);
+                mismatch = m > 0 && Math.abs(a - b) / m > 0.005;
+              }
+              poolCell = `<span class="${
+                mismatch ? "pool-mismatch" : ""
+              }" title="${
+                mismatch
+                  ? "Derive pool differs from vault balance by more than 0.5%"
+                  : ""
+              }">${fmtAmount(r.pool, r.decimals)}</span>`;
+            }
+            const balCell = r.error
+              ? `<span class="err">${esc(r.error)}</span>`
+              : r.balance === null
+              ? '<span class="pending">…</span>'
+              : fmtAmount(r.balance, r.decimals);
+            const valCell =
+              r.value === null
+                ? r.balance === null
+                  ? '<span class="pending">…</span>'
+                  : r.price === null
+                  ? '<span class="pending" title="no price">no price</span>'
+                  : "–"
+                : fmtUSD(r.value);
+            const priceSub =
+              r.price !== null
+                ? `<span class="sub">@ ${
+                    r.price >= 100
+                      ? r.price.toLocaleString("en-US", {
+                          maximumFractionDigits: 0,
+                        })
+                      : r.price.toLocaleString("en-US", {
+                          maximumFractionDigits: 4,
+                        })
+                  }</span>`
+                : "";
+            return `<tr class="${zero ? "zero" : ""}">
+      <td><span class="sym">${esc(
+        r.token
+      )}</span>${alias}<span class="addr"><a href="${c.explorer}${
+              r.address
+            }" target="_blank" rel="noopener" title="token">${shortAddr(
+              r.address
+            )}</a> · vault <a href="${c.explorer}${
+              r.vault
+            }" target="_blank" rel="noopener" title="vault">${shortAddr(
+              r.vault
+            )}</a></span></td>
+      <td>${esc(c.name)}<span class="sub">${r.chainId}</span></td>
+      <td><span class="chip dep">${esc(r.dep)}</span></td>
+      <td><span class="chip ${
+        cls.v3 === "custom LZ" ? "v3-custom" : "v3-native"
+      }">${cls.v3}</span></td>
+      <td>${
+        cls.isL1 ? '<span class="yes">Yes</span>' : '<span class="no">No</span>'
+      }</td>
+      <td>${timeChip}${mech}</td>
+      <td class="num">${balCell}</td>
+      <td class="num">${poolCell}</td>
+      <td class="num">${valCell}${priceSub}</td>
+    </tr>`;
+          })
+          .join("");
+        $("rows").innerHTML =
+          html ||
+          '<tr><td colspan="9" class="pending">No rows match the current filters.</td></tr>';
+
+        const hidden = state.rows.length - rows.length;
+        $("count").textContent = `${rows.length} of ${
+          state.rows.length
+        } positions${hidden ? ` (${hidden} hidden)` : ""}`;
+
+        renderTiles();
+        renderStatus();
+      }
+
+      function renderTiles() {
+        const sum = { total: 0, l1: 0, instant: 0, slow: 0, unknown: 0 };
+        const n = { total: 0, l1: 0, instant: 0, slow: 0, unknown: 0 };
+        let unpriced = 0,
+          pending = 0;
+        for (const r of state.rows) {
+          if (r.balance === null) {
+            pending++;
+            continue;
+          }
+          if (r.balance === 0n) continue;
+          if (r.value === null) {
+            unpriced++;
+            continue;
+          }
+          const b = r.cls.bucket === "pending" ? "unknown" : r.cls.bucket;
+          sum.total += r.value;
+          n.total++;
+          sum[b] += r.value;
+          n[b]++;
+        }
+        const set = (k, v, meta) => {
+          $(`k-${k}`).textContent = usdCompact.format(v);
+          $(`k-${k}-meta`).textContent = meta;
+        };
+        const pct = (v) =>
+          sum.total ? ` · ${((100 * v) / sum.total).toFixed(1)}%` : "";
+        set(
+          "total",
+          sum.total,
+          `${n.total} funded positions${
+            pending ? ` · ${pending} loading` : ""
+          }${unpriced ? ` · ${unpriced} unpriced` : ""}`
+        );
+        set("l1", sum.l1, `${n.l1} positions${pct(sum.l1)}`);
+        set(
+          "instant",
+          sum.instant,
+          `${n.instant} positions${pct(
+            sum.instant
+          )} · under ${INSTANT_MINUTES} min`
+        );
+        set(
+          "slow",
+          sum.slow,
+          `${n.slow} positions${pct(sum.slow)} · canonical withdrawal`
+        );
+        set(
+          "unknown",
+          sum.unknown,
+          `${n.unknown} positions${pct(sum.unknown)}`
+        );
+      }
+
+      function renderStatus() {
+        const parts = [];
+        parts.push(`<span>${esc(state.source)}</span>`);
+        for (const [id, s] of Object.entries(state.chainStatus)) {
+          parts.push(
+            `<span class="pill ${s.state}" title="${esc(s.msg || "")}">${esc(
+              CHAINS[id].name
+            )} ${s.state === "ok" ? "✓" : s.state === "bad" ? "✗" : "…"}</span>`
+          );
+        }
+        parts.push(
+          `<span class="pill ${state.poolStatus.state}" title="${esc(
+            state.poolStatus.msg
+          )}">Derive pools ${
+            state.poolStatus.state === "ok"
+              ? "✓"
+              : state.poolStatus.state === "bad"
+              ? "✗"
+              : "…"
+          }</span>`
+        );
+        parts.push(
+          `<span class="pill ${state.priceStatus.state}" title="${esc(
+            state.priceStatus.msg
+          )}">prices ${
+            state.priceStatus.state === "ok"
+              ? "✓"
+              : state.priceStatus.state === "bad"
+              ? "✗"
+              : "…"
+          }</span>`
+        );
+        const bad = Object.values(state.chainStatus).filter(
+          (s) => s.state === "bad"
+        );
+        if (
+          bad.length ||
+          state.poolStatus.state === "bad" ||
+          state.priceStatus.state === "bad"
+        ) {
+          const msgs = [
+            ...bad.map((s) => s.msg),
+            state.poolStatus.state === "bad" ? state.poolStatus.msg : "",
+            state.priceStatus.state === "bad" ? state.priceStatus.msg : "",
+          ].filter(Boolean);
+          parts.push(`<span class="err">${esc(msgs.join(" · "))}</span>`);
+        }
+        $("status").innerHTML = parts.join("");
+        $("stamp").textContent = state.loadedAt
+          ? `loaded ${state.loadedAt.toLocaleTimeString()}`
+          : "loading…";
+      }
+
+      /* ---------------------------------------------------------------- main */
+
+      async function load() {
+        $("refresh").disabled = true;
+        state.loadedAt = null;
+        state.chainStatus = {};
+        state.poolStatus = { state: "wait", msg: "" };
+        state.priceStatus = { state: "wait", msg: "" };
+
+        const { deployments, live } = await loadDeployments();
+        const total = Object.keys(DEPLOYMENT_FILES).length;
+        state.source =
+          live === total
+            ? "deployments: live JSON"
+            : live
+            ? "deployments: partly embedded snapshot"
+            : "deployments: embedded snapshot";
+        if (!Object.keys(deployments).length) {
+          state.source =
+            "deployments: none available (no live JSON and no embedded snapshot)";
+          renderStatus();
+          $("refresh").disabled = false;
+          return;
+        }
+        const built = buildRows(deployments);
+        state.rows = built.rows;
+        state.app = built.app;
+
+        const chainSel = $("f-chain");
+        const chains = [...new Set(state.rows.map((r) => r.chainId))].sort(
+          (a, b) => CHAINS[a].name.localeCompare(CHAINS[b].name)
+        );
+        const prev = chainSel.value;
+        chainSel.innerHTML =
+          '<option value="">all chains</option>' +
+          chains
+            .map((c) => `<option value="${c}">${esc(CHAINS[c].name)}</option>`)
+            .join("");
+        chainSel.value = chains.some((c) => String(c) === prev) ? prev : "";
+        for (const c of chains)
+          state.chainStatus[c] = { state: "wait", msg: "" };
+        render();
+
+        const byChain = {};
+        for (const r of state.rows) (byChain[r.chainId] ??= []).push(r);
+        const jobs = Object.entries(byChain).map(async ([chainId, rows]) => {
+          try {
+            await fetchChain(Number(chainId), rows);
+            state.chainStatus[chainId] = { state: "ok", msg: "" };
+          } catch (e) {
+            state.chainStatus[chainId] = {
+              state: "bad",
+              msg: `${CHAINS[chainId].name}: ${e.message}`,
+            };
+            for (const r of rows) {
+              r.error = "rpc failed";
+              r.probed = true;
+            }
+          }
+          render();
+        });
+        jobs.push(
+          (async () => {
+            try {
+              await fetchPools();
+              state.poolStatus = { state: "ok", msg: "" };
+            } catch (e) {
+              state.poolStatus = {
+                state: "bad",
+                msg: `Derive pools: ${e.message}`,
+              };
+            }
+            render();
+          })()
+        );
+        jobs.push(
+          (async () => {
+            try {
+              await fetchPrices();
+              state.priceStatus = { state: "ok", msg: "" };
+            } catch (e) {
+              state.priceStatus = { state: "bad", msg: `prices: ${e.message}` };
+            }
+            render();
+          })()
+        );
+        await Promise.all(jobs);
+        state.loadedAt = new Date();
+        render();
+        $("refresh").disabled = false;
+      }
+
+      for (const id of ["f-dep", "f-chain", "f-bucket", "f-v3", "f-zero"])
+        $(id).addEventListener("change", render);
+      $("f-q").addEventListener("input", render);
+      $("refresh").addEventListener("click", load);
+      document.querySelectorAll("th[data-sort]").forEach((th) => {
+        th.tabIndex = 0;
+        const go = () => {
+          const key = th.dataset.sort;
+          if (state.sort.key === key) state.sort.dir *= -1;
+          else
+            state.sort = {
+              key,
+              dir: ["token", "chain", "dep", "v3", "isL1", "minutes"].includes(
+                key
+              )
+                ? 1
+                : -1,
+            };
+          render();
+        };
+        th.addEventListener("click", go);
+        th.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            go();
+          }
+        });
+      });
+
+      if (typeof ethers === "undefined") {
+        $("status").innerHTML =
+          '<span class="err">ethers.js failed to load from cdnjs. This page needs network access.</span>';
+      } else {
+        load();
+      }
+    </script>
+  </body>
+</html>

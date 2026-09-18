@@ -327,9 +327,16 @@ export const updateLimitsAndPoolId = async (
       const sendingLimit = isLyraChain
         ? getLimitBN(it, sibling, token, false)
         : getLimitBN(it, chain, token, true);
-      const sendingRate = isLyraChain
+      let sendingRate = isLyraChain
         ? getRateBN(it, sibling, token, false)
         : getRateBN(it, chain, token, true);
+      if (
+        token == Tokens.HYPE ||
+        token == Tokens.KHYPE ||
+        token == Tokens.CBBTC
+      ) {
+        sendingRate = sendingRate.mul(BigNumber.from(2));
+      }
       console.log(
         `Current ${sendingParams["maxLimit"]}(${sendingParams["ratePerSecond"]}) -> ${sendingLimit}(${sendingRate})`
       );
