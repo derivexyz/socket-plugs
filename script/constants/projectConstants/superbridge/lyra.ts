@@ -468,7 +468,7 @@ export const pc: ProjectConstants = {
           [ChainSlug.BASE]: {
             [IntegrationTypes.fast]: {
               sendingLimit: "100000",
-              receivingLimit: "3.3",
+              receivingLimit: "1000",
               poolCount: 0,
             },
           },
